@@ -41,9 +41,10 @@ def get_ranking(site_id, site_qid):
         # Check if runid is paired with a timestamp (new format)
         if isinstance(runid_pair,list):
             runid, run_modified_time = runid_pair
-            if run_modified_time < query['doclist_modified_time'] :
-                print("too old")
-                continue
+            if 'doclist_modified_time' in query:
+                if run_modified_time < query['doclist_modified_time'] :
+                    print("too old")
+                    continue
             age_threshold = datetime.datetime.now() - datetime.timedelta(days=2*7) # TODO: make constant
             if run_modified_time < age_threshold:
                 print("too old 2")
@@ -90,8 +91,11 @@ def add_run(key, qid, runid, doclist):
 
     if in_test_period and "type" in q and q["type"] == "test" \
             and "runs" in q and key in q["runs"]:
-        raise ValueError("For test queries you can only upload a run once "
-                         "during a test period.")
+                
+        # Hack to always enable baseline participant to submit runs
+        if (key!="0EF9706FD1359FB8-A9GQJWD0XU04GO2R"):
+            raise ValueError("For test queries you can only upload a run once "
+                             "during a test period.")
     sites = user.get_sites(key)
     if q["site_id"] not in sites:
         raise LookupError("First sign up for site %s." % q["site_id"])
@@ -246,13 +250,15 @@ def remove_runs_user(key):
     #print "Before"
     #print queries
     for query in queries:
-        runs = query["runs"]
-        if key in runs:
-            del runs[key]
+        if "runs" in query:
+            runs = query["runs"]
+            if key in runs:
+                print "Removing runid " + runs[key]
+                del runs[key]
 
-        # Update runs list
-        query["runs"] = runs
-        db.query.save(query)
+            # Update runs list
+            query["runs"] = runs
+            db.query.save(query)
     #print "After"
     #print [query for query in db.query.find(q)]
 

@@ -19,6 +19,7 @@ import signal
 import os
 import shutil
 import tempfile
+import time
 
 MONGODB_CONFIG = "config/mongodb.conf"
 LL_CONFIG = "config/livinglabs.ini"
@@ -36,7 +37,7 @@ DUMP_PATH = "dump"
 SITE_KEY = "E0016261DE4C0D61-M6C4AMHHE4WV4OVY"
 PARTICIPANT_KEY = "9EA887B684DD5822-JBB2XOCVEGYE7YAZ"
 HOST = "localhost"
-N_ITERATIONS = 1  # number of iterations site or participant runs
+N_ITERATIONS = 5  # number of iterations site or participant runs
 
 
 class TestLL(unittest.TestCase):
@@ -79,17 +80,19 @@ class TestLL(unittest.TestCase):
         self.api_process = subprocess.Popen(["./bin/api",
                                              "-c", LL_CONFIG, ll_db_config,
                                              "--debug"])
+        time.sleep(3) # wait for API to load
+        
         # Fill database with users
         subprocess.call(["./bin/admin", "db", "--import-json", DUMP_PATH,
                          "-c", ll_db_config])
 
     def test_site(self):
-        print("Test client")
+        print("Test site")
         subprocess.call(["./bin/client-site", "--host", HOST, "--key", SITE_KEY,
                          "-q", "-d",
                          "--wait_max", "0",
                          "--wait_min", "0"])
-        print("Simulate client")
+        print("Simulate site")
         site_output = subprocess.check_output(["./bin/client-site",
                                                "--host", "localhost",
                                                "--key", SITE_KEY,
@@ -113,6 +116,7 @@ class TestLL(unittest.TestCase):
                                                       str(N_ITERATIONS),
                                                       "--wait_max", "0",
                                                       "--wait_min", "0"])
+        print participant_output
         for line in participant_output.split("\n"):
             if len(line) > 0:
                 first = line[0]
