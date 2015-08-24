@@ -229,18 +229,20 @@ def remove_runs_user(key):
 
     q = {"deleted": {"$ne": True}}
     queries = [query for query in db.query.find(q)]
-    print "Before"
-    print queries
+    #print "Before"
+    #print queries
     for query in queries:
-        runs = query["runs"]
-        if key in runs:
-            del runs[key]
+        if "runs" in query:
+            runs = query["runs"]
+            if key in runs:
+                print "Removing runid " + runs[key]
+                del runs[key]
 
-        # Update runs list
-        query["runs"] = runs
-        db.query.save(query)
-    print "After"
-    print [query for query in db.query.find(q)]
+            # Update runs list
+            query["runs"] = runs
+            db.query.save(query)
+    #print "After"
+    #print [query for query in db.query.find(q)]
 
     # Return resulting query list, with removed runs
     return [query for query in db.query.find(q)]

@@ -363,3 +363,25 @@ trivial).
    $ ./bin/admin db --clear -c config/db.ini
 
 Do not forget to recreate users (see above).
+
+
+Remove all runs for a participant
+---------------------------------
+
+There can be cases where you may want to remove all runs for a certain participant.
+For example, if a participant has a ranking algorithm which is not competitive,
+it will only take user impressions from the other participants. The participant
+could then request you as administrator to remove the runs.
+
+The admin tool has a :code:`--remove-runs` option to accomplish this. Supply the key
+of the participant for which you want to remove all runs.
+
+ .. danger::
+    All runs for the given participant will be removed from the :code:`query`
+    collection! Sites will thus not be able to find rankings from this participant
+    when looking for a query. The runs are still available in the :code:`run`
+    collection, but they are not easy to look up from there.
+
+.. sourcecode:: bash
+
+   $ ./bin/admin user --remove-runs -c config/db.ini --key KEY
