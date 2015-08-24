@@ -37,7 +37,21 @@ def get_ranking(site_id, site_qid):
                           % site_qid)
     allruns = query["runs"].items()
     random.shuffle(allruns)
-    for userid, runid in allruns:
+    for userid, runid_pair in allruns:
+        # Check if runid is paired with a timestamp (new format)
+        if isinstance(runid_pair,list):
+            runid, run_modified_time = runid_pair
+            if run_modified_time < query['doclist_modified_time'] :
+                print("too old")
+                continue
+            age_threshold = datetime.datetime.now() - datetime.timedelta(days=2*7) # TODO: make constant
+            if run_modified_time < age_threshold:
+                print("too old 2")
+        else:
+            print("not a tuple")
+            # Old format: not paired with timestamp, only runid present
+            runid = runid_pair
+        print(runid)
         runs = db.run.find({"runid": runid,
                             "site_qid": site_qid,
                             "userid": userid
@@ -89,6 +103,8 @@ def add_run(key, qid, runid, doclist):
             raise LookupError("Document not found: docid = '%s'. Only submit "
                               "runs with existing documents." % doc["docid"])
         doc["site_docid"] = doc_found["site_docid"]
+
+    creation_time = datetime.datetime.now()
     run = {
         "userid": key,
         "qid": qid,
@@ -96,7 +112,7 @@ def add_run(key, qid, runid, doclist):
         "site_id": q["site_id"],
         "runid": runid,
         "doclist": doclist,
-        "creation_time": datetime.datetime.now(),
+        "creation_time": creation_time,
         }
     db.run.remove({"runid": runid,
                    "qid": qid,
@@ -106,7 +122,8 @@ def add_run(key, qid, runid, doclist):
         runs = q["runs"]
     else:
         runs = {}
-    runs[key] = runid
+    runs[key] = (runid, creation_time)
+
     q["runs"] = runs
     db.query.save(q)
     return run
@@ -220,3 +237,25 @@ def get_trec(site_id):
                                             test_period["NAME"],
                                             rawcount=True))
     return trec_runs, trec_qrels, trec_qrels_raw
+
+# Remove all runs submitted by a certain participant
+def remove_runs_user(key):
+
+    q = {"deleted": {"$ne": True}}
+    queries = [query for query in db.query.find(q)]
+    #print "Before"
+    #print queries
+    for query in queries:
+        runs = query["runs"]
+        if key in runs:
+            del runs[key]
+
+        # Update runs list
+        query["runs"] = runs
+        db.query.save(query)
+    #print "After"
+    #print [query for query in db.query.find(q)]
+
+    # Return resulting query list, with removed runs
+    return [query for query in db.query.find(q)]
+

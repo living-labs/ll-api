@@ -41,6 +41,7 @@ def add_doclist(site_id, site_qid, doclist):
             store_doclist.append(doc_found["_id"])
 
     query["doclist"] = store_doclist
+    query["doclist_modified_time"] = datetime.datetime.now()
     db.query.save(query)
     return get_doclist(site_id=site_id, site_qid=site_qid)
 

@@ -38,6 +38,14 @@ def user(args, parser):
     # Log in to database
     ll.core.db.db.init_db(args.mongodb_db,
                             args.mongodb_user, args.mongodb_user_pw)
+
+    if args.remove_runs and args.key:
+        ll.core.run.remove_runs_user(args.key)
+        return
+    elif args.remove_runs:
+        print "Please supply the key of the user for which you want to remove all submitted runs."
+        return
+
     if args.key and args.delete:
         ll.core.user.delete_user(args.key)
         return
@@ -169,6 +177,8 @@ if __name__ == '__main__':
     subparser_user.add_argument('--password', type=str,
                                 help='Password (for --create and/or '
                                 '--site).')
+    subparser_user.add_argument('--remove-runs', action="store_true", default=False,
+                                help='Removes ALL runs submitted by this user (key required).')
     subparser_user.add_argument('--delete', action="store_true", default=False,
                                 help='Delete user (key required).')
     subparser_user.add_argument('--create', action="store_true", default=False,
