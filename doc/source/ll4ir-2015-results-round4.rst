@@ -1,9 +1,9 @@
-.. _ll4ir-results-round3:
+.. _ll4ir-results-round4:
 
-LL4IR Round #3 Results
+LL4IR Round #4 Results
 ======================
 
-This page presents the LL4IR Round #3 results. This round ran from July 15, 2015 till July 31, 2015.
+This page presents the LL4IR Round #4 results. This round ran from Aug 15, 2015 till Aug 31, 2015.
 
 #Impressions is the total number of times when rankings (for any of the test queries) from the given team/system have been displayed to users.
 The number of wins, losses, and ties are calculated against the production system, where a win is defined as the experimental system having more clicks on results assigned to it by Team Draft Interleaving than clicks on results assigned to the production system.
@@ -18,17 +18,12 @@ Product search
 ============ ======= ===== ======= ===== ============
 Teamname     Outcome #Wins #Losses #Ties #Impressions
 ============ ======= ===== ======= ===== ============
-Peter Dekker 0.5429  19    16      76    111*
 Expected     0.5
-IRIT         0.4890  89    93      533   715
-UiS-Mira     0.4507  64    78      527   669
-Baseline     0.4430  66    83      498   647
-GESIS        0.4134  74    105     513   692
-UiS-Jern     0.3702  67    114     511   692
-UiS-UiS      0.3459  55    104     521   680
+IRIT         0.4654  101   116     767   984
+GESIS        0.4292  103   137     804   1044
+Baseline     0.3783  87    143     781   1011
 ============ ======= ===== ======= ===== ============
 
-*This team did not submit runs for all queries.
 
 Web search
 ~~~~~~~~~~
@@ -36,10 +31,7 @@ Web search
 ====================== ======= ===== ======= ===== ============
 Teamname               Outcome #Wins #Losses #Ties #Impressions 
 ====================== ======= ===== ======= ===== ============
-Exploitative Baseline  0.5203  2161  1992    13206 17359
 Expected               0.5
-UvA-LambdaMart         0.2405  2264  7148    7863  17275
-Uniform Baseline       0.2157  313   1138    922   2373*
+Exploitative Baseline  0.4500  18    22      134   174
+UvA-LambdaMart         0.2059  21    81      89    191
 ====================== ======= ===== ======= ===== ============
-
-*This team did not submit runs for all queries.
