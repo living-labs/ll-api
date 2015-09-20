@@ -75,7 +75,8 @@
 	    <ul class="dropdown-menu">
 	      <li class="{% if request.path.startswith("/user/me") %}active{% endif %}"><a href="/user/me">Profile</a></li>
 	      {% if user.is_participant %}
-	      <li class="{% if request.path.startswith("/user/sites") %}active{% endif %}"><a href="/user/sites/">Site Agreements</a></li>
+	      <li class="{% if request.path.startswith("/user/sites") %}active{% endif %}"><a href="/user/sites/">Site agreements</a></li>
+          <li class="{% if request.path.startswith("/user/runs") %}active{% endif %}"><a href="/user/runs/">Outdated runs</a></li>
 	      {% endif %}
 	      <li class="divider"></li>
 	      <li><a href="/user/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>

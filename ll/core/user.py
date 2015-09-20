@@ -28,6 +28,7 @@ def send_email(user, txt, subject):
     if not config["SEND_EMAIL"]:
         return False
     try:
+        print "0"
         msgtxt = "Hi %s,\n\n" % user["teamname"]
         msgtxt += txt
         msgtxt += "\n\n"
@@ -42,15 +43,22 @@ def send_email(user, txt, subject):
         msgtxt += "\n\n"
         msgtxt += "With regards,\n"
         msgtxt += "The organizers"
+        print "a"
         msg = MIMEText(msgtxt)
+        print "b"
         msg['subject'] = "[CLEF Living Lab] %s" % subject
         email_from = config["EMAIL_FROM"]
         email_to = user['email']
         msg['From'] = email_from
         msg['To'] = email_to
+        print "1"
         s = smtplib.SMTP('localhost')
+        s.set_debuglevel(True)
+        print "2"
         s.sendmail(email_from, [email_to], msg.as_string())
+        print "3"
         s.quit()
+        print "4"
         return True
     except:
         raise Exception("Error sending email, either disable or setup properly.")

@@ -41,18 +41,9 @@ def get_ranking(site_id, site_qid):
         # Check if runid is paired with a timestamp (new format)
         if isinstance(runid_pair,list):
             runid, run_modified_time = runid_pair
-            if 'doclist_modified_time' in query:
-                if run_modified_time < query['doclist_modified_time'] :
-                    print("too old")
-                    continue
-            age_threshold = datetime.datetime.now() - datetime.timedelta(days=2*7) # TODO: make constant
-            if run_modified_time < age_threshold:
-                print("too old 2")
         else:
-            print("not a tuple")
-            # Old format: not paired with timestamp, only runid present
+            # Not paired with timestamp, only runid present (old format)
             runid = runid_pair
-        print(runid)
         runs = db.run.find({"runid": runid,
                             "site_qid": site_qid,
                             "userid": userid
@@ -264,4 +255,17 @@ def remove_runs_user(key):
 
     # Return resulting query list, with removed runs
     return [query for query in db.query.find(q)]
+
+# Get all runs by a certain user
+def get_runs(key):
+
+    q = {"deleted": {"$ne": True}}
+    queries = [query for query in db.query.find(q)]
+    runs_user = []
+    for query in queries:
+        if "runs" in query:
+            runs = query["runs"]
+            if key in runs:
+                runs_user.append(runs[key])
+    return runs_user
 

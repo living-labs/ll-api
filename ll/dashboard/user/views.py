@@ -87,6 +87,43 @@ def register():
     return render_template("user/register.html", form=form, user=g.user)
 
 
+@mod.route('/runs/', methods=['GET', 'POST'])
+@requires_login
+def runs():
+    if not g.user["is_participant"]:
+        flash('Only participants can select runs. Please register or sign in as a participant', 'alert-warning')
+        return redirect(url_for('user.home'))
+    if not g.user["is_verified"]:
+        flash('You need to be verified first, please send the organizers a signed <a href="%s">registration form<a/>.'
+              % core.config.config["URL_REGISTRATION_FORM"], 'alert-warning')
+        return redirect(url_for('user.home'))
+
+    class RunsForm(Form):
+        pass
+
+    for run in core.run.get_runs(g.user["_id"]):
+        print run
+        default = False
+        if isinstance(run,list):
+            # If paired with timestamp
+            description = str(run[1])
+            runid = run[0]
+        else:
+            description = ""
+            runid = run
+
+        setattr(RunsForm, runid, BooleanField(runid,
+                                                     description=description,
+                                                     default=default))
+
+    form = RunsForm(request.form)
+    if form.validate_on_submit():
+        #sites = [k for k in form.data if form.data[k]]
+        #core.user.set_sites(g.user["_id"], sites)
+        #flash('Agreements to site terms have been saved.', 'alert-success')
+        return redirect(url_for('site.home'))
+    return render_template("user/runs.html", form=form, user=g.user)
+
 @mod.route('/sites/', methods=['GET', 'POST'])
 @requires_login
 def sites():
@@ -107,7 +144,7 @@ def sites():
             continue
         description = site["terms"] if "terms" in site and site["terms"] else "No additional terms."
         default = True if site['_id'] in usersites else False
-        setattr(SitesForm, site['_id'], BooleanField(site['name'] + ("<img src=\"/static/icon_robot.svg\" style=\"height: 14px; position: relative;top: -3px;left: 2px;\"/>" 
+        setattr(SitesForm, site['_id'], BooleanField(site['name'] + ("<img src=\"/static/icon_robot.svg\" style=\"height: 14px; position: relative;top: -3px;left: 2px;\"/>"
                                                                      if site["is_robot"] else ""),
                                                      description=description,
                                                      default=default))
@@ -119,7 +156,6 @@ def sites():
         flash('Agreements to site terms have been saved.', 'alert-success')
         return redirect(url_for('site.home'))
     return render_template("user/sites.html", form=form, user=g.user)
-
 
 @mod.route('/forgot/', methods=['GET', 'POST'])
 def forgot():

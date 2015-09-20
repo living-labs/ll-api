@@ -1,0 +1,54 @@
+{# This file is part of Living Labs Challenge, see http://living-labs.net.
+ #
+ # Living Labs Challenge is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU Lesser General Public License as published by
+ # the Free Software Foundation, either version 3 of the License, or
+ # (at your option) any later version.
+ #
+ # Living Labs Challenge is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Lesser General Public License for more details.
+ #
+ # You should have received a copy of the GNU Lesser General Public License
+ # along with Living Labs Challenge. If not, see <http://www.gnu.org/licenses/>.
+ #}
+    {% extends "base.html" %}
+    {% block header %}
+    	Outdated runs
+    {% endblock %}
+    {% block content %}
+      Runs shown on this page are outdated and will soon be deactivated. You can reactivate them for a period of 30 days
+        by clicking the Reactivate button.
+      {% from "forms/macros.html" import render_field %}
+      <form method="POST" action="." class="form">
+        {{ form.csrf_token }}
+		<table class="table table-striped">
+		  <thead>
+		    <tr>
+		      <th>Reactivated</th>
+		      <th>Run</th>
+		      <th>Timestamp</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+			{% for field in form %}
+			    {% if field.name != "csrf_token" %}
+			    <tr>
+			        <td>{{ field }}</td>
+			        <td>{{ field.label }}{% if field.is_robot %}<img src="/static/icon_robot.svg" style="height: 14px; position: relative;top: -3px;left: 2px;"/>{% endif %}</td>
+			        <td>{{ field.description }}</td>
+			    </tr>
+			    {% endif %}
+			{% endfor %}
+		  </tbody>
+		</table>
+        <div class="form-group">
+      		<div>
+        		<button type="submit" class="btn btn-primary">Reactivate</button>
+      		</div>
+    	</div>
+    	Sites marked with a <img src="/static/icon_robot.svg" style="height: 14px; position: relative;top: -3px;left: 2px;"/> are simulations. 
+    
+      </form>
+    {% endblock %}
