@@ -49,6 +49,10 @@ if __name__ == '__main__':
     group_flask.add_argument('--port', dest='port', default=5000, type=int,
                         help='Port to listen on.')
     group_mongodb = parser.add_argument_group("mongodb", section="mongodb")
+    group_mongodb.add_argument('--mongodb_host', default="localhost", type=str,
+                        help='')
+    group_mongodb.add_argument('--mongodb_port', default=27017, type=int,
+                        help='')
     group_mongodb.add_argument('--mongodb_db', default="ll", type=str,
                         help='')
     group_mongodb.add_argument('--mongodb_user', default=None, type=str,
@@ -65,7 +69,7 @@ if __name__ == '__main__':
     atexit.register(lambda: cron.shutdown(wait=False))
 
     app.debug = args.debug
-    db.init_db(args.mongodb_db, user=args.mongodb_user,
+    db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db, user=args.mongodb_user,
                password=args.mongodb_user_pw)
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(args.port, address=args.host)

@@ -26,10 +26,10 @@ class CoreDatabase(object):
     def __getattr__(self, name):
         return self.db.__getattr__(name)
 
-    def init_db(self, db_name, user=None, password=None, authenticationDatabase=None):
+    def init_db(self, host, port, db_name, user=None, password=None, authenticationDatabase=None):
         #print("Initialize db ", db_name, "with user", user, "and password", password, "on authbase", authenticationDatabase)
         if self.db == None:
-            client = MongoClient()
+            client = MongoClient(host, port)
             self.db = client[db_name]
             if user and password:
                 #print("Now really logging in with", user, "and", password, "on", authenticationDatabase)
@@ -45,29 +45,30 @@ def clear():
     db.feedback.remove({})
     db.run.remove({})
     
-def create_db_admin(adminname, admin_password):
+def create_db_admin(host, port, adminname, admin_password):
     # Log in to the 'admin' db, without authentication
     admin_db = CoreDatabase()
-    admin_db.init_db("admin")
+    admin_db.init_db(host,port,"admin")
     # Create admin
     admin_db.db.add_user(adminname, admin_password,roles=[{"role": "userAdminAnyDatabase","db":"admin"}])
 
-def create_db_user(username, user_password, db_name, adminname, admin_password):
+def create_db_user(host, port, username, user_password, db_name, adminname, admin_password):
     # Log in to the main db, using the admin
     main_db = CoreDatabase()
-    main_db.init_db(db_name,adminname,admin_password,authenticationDatabase="admin")
+    main_db.init_db(host, port, db_name,adminname,admin_password,authenticationDatabase="admin")
     # Create user
     main_db.db.add_user(username, user_password,roles = ["readWrite"])
 
-def setup_db_users(username, user_password, db_name, adminname, admin_password):
+def setup_db_users(host, port, username, user_password, db_name, adminname, admin_password):
     print("Creating admin")
-    create_db_admin(adminname, admin_password)
+    create_db_admin(host, port, adminname, admin_password)
     print("Creating user")
-    create_db_user(username, user_password, db_name, adminname, admin_password)
+    create_db_user(host, port, username, user_password, db_name, adminname, admin_password)
 
-def export_json(path, database, username, password):
+def export_json(path, host, port, database, username, password):
     # Create binary BSON dump from current database
-    subprocess.call(["mongodump","-u",username,"-p", password,"-d",database, "-o",path])
+    host_port = host + ":" + str(port)
+    subprocess.call(["mongodump","-u",username,"-p", password,"-d",database, "-o",path, "--host", host_port])
 
     # Convert BSON file to JSON files
     path_database = os.path.join(path,database)
@@ -80,12 +81,14 @@ def export_json(path, database, username, password):
                 subprocess.call(["bsondump", filename+".bson"], stdout=output_file)
 
 
-def import_json(path, database, username, password):
+def import_json(path, host, port, database, username, password):
     # Loop over all collections, they have their own json-file and json-metafile
     for collection in ["doc","feedback","historical","query","run","site","system","user"]:
         json_file=os.path.join(path,database,collection)+".json"
         # Import json database file for this collection
-        subprocess.call(["mongoimport", "-u", username, "-d", database, "-c", collection,"-p", password,"--file", json_file])
+
+        host_port = host + ":" + str(port)
+        subprocess.call(["mongoimport", "-u", username, "-d", database, "-c", collection,"-p", password,"--file", json_file,"--host", host_port])
         # Import metadata (indexes) for this collection
         if collection != "system":
             import_metadata(path,database,collection)

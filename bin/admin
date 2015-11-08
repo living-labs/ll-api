@@ -36,7 +36,7 @@ def trycall(func, args, parser):
 
 def user(args, parser):
     # Log in to database
-    ll.core.db.db.init_db(args.mongodb_db,
+    ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                             args.mongodb_user, args.mongodb_user_pw)
 
     if args.remove_runs and args.key:
@@ -81,7 +81,7 @@ def user(args, parser):
 
 def status(args, parser):
     # Log in to database
-    ll.core.db.db.init_db(args.mongodb_db,
+    ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                             args.mongodb_user, args.mongodb_user_pw)
     print "STATUS", args
 
@@ -89,7 +89,7 @@ def status(args, parser):
 def db(args, parser):
     # Log in to database, only possible if database has already been set up
     if (not args.setup_db_users):
-        ll.core.db.db.init_db(args.mongodb_db,
+        ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw)
     
     # Clear database
@@ -100,7 +100,7 @@ def db(args, parser):
     if (args.setup_db_users and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw
     and args.mongodb_admin and args.mongodb_admin_pw):
-        ll.core.db.setup_db_users(args.mongodb_user, args.mongodb_user_pw,
+        ll.core.db.setup_db_users(args.mongodb_host, args.mongodb_port, args.mongodb_user, args.mongodb_user_pw,
                                     args.mongodb_db,
                                     args.mongodb_admin, args.mongodb_admin_pw)
     elif args.setup_db_users:
@@ -110,7 +110,7 @@ def db(args, parser):
     # Import JSON
     if (args.import_json and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw):
-        ll.core.db.import_json(args.import_json, args.mongodb_db,
+        ll.core.db.import_json(args.import_json, args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw)
     elif args.import_json:
         print("--import-json: Supply a MongoDB database, user and password \
@@ -118,7 +118,7 @@ def db(args, parser):
     # Export JSON
     if (args.export_json and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw):
-        ll.core.db.export_json(args.export_json, args.mongodb_db,
+        ll.core.db.export_json(args.export_json, args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw)
     elif args.export_json:
         print("--export-json: Supply a MongoDB database, user and password \
@@ -127,7 +127,7 @@ def db(args, parser):
 
 def trec(args, parser):
     # Log in to database
-    ll.core.db.db.init_db(args.mongodb_db,
+    ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                             args.mongodb_user, args.mongodb_user_pw)
     
     runs, qrels, qrels_raw = ll.core.run.get_trec(args.site_id)
@@ -146,6 +146,10 @@ def trec(args, parser):
 if __name__ == '__main__':
     def add_mongodb(parser):
         group_mongodb = parser.add_argument_group("mongodb", section="mongodb")
+        group_mongodb.add_argument('--mongodb_host', default="localhost", type=str,
+                        help='')
+        group_mongodb.add_argument('--mongodb_port', default=27017, type=int,
+                        help='')
         group_mongodb.add_argument('--mongodb_db', default="ll", type=str,
                                    help='Mongodb database.')
         group_mongodb.add_argument('--mongodb_user', default=None, type=str,
