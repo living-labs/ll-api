@@ -37,7 +37,7 @@ def trycall(func, args, parser):
 def user(args, parser):
     # Log in to database
     ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
-                            args.mongodb_user, args.mongodb_user_pw)
+                            args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
 
     if args.remove_runs and args.key:
         ll.core.run.remove_runs_user(args.key)
@@ -82,7 +82,7 @@ def user(args, parser):
 def status(args, parser):
     # Log in to database
     ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
-                            args.mongodb_user, args.mongodb_user_pw)
+                            args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
     print "STATUS", args
 
 
@@ -90,7 +90,7 @@ def db(args, parser):
     # Log in to database, only possible if database has already been set up
     if (not args.setup_db_users):
         ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
-                                args.mongodb_user, args.mongodb_user_pw)
+                                args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
     
     # Clear database
     if args.clear:
@@ -111,7 +111,7 @@ def db(args, parser):
     if (args.import_json and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw):
         ll.core.db.import_json(args.import_json, args.mongodb_host, args.mongodb_port, args.mongodb_db,
-                                args.mongodb_user, args.mongodb_user_pw)
+                                args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
     elif args.import_json:
         print("--import-json: Supply a MongoDB database, user and password \
                     through the commandline or via a configuration file.")
@@ -119,7 +119,7 @@ def db(args, parser):
     if (args.export_json and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw):
         ll.core.db.export_json(args.export_json, args.mongodb_host, args.mongodb_port, args.mongodb_db,
-                                args.mongodb_user, args.mongodb_user_pw)
+                                args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
     elif args.export_json:
         print("--export-json: Supply a MongoDB database, user and password \
                     through the commandline or via a configuration file.")
@@ -128,7 +128,7 @@ def db(args, parser):
 def trec(args, parser):
     # Log in to database
     ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
-                            args.mongodb_user, args.mongodb_user_pw)
+                            args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
     
     runs, qrels, qrels_raw = ll.core.run.get_trec(args.site_id)
     os.makedirs(os.path.join(args.dir, args.site_id, "run"))
@@ -162,6 +162,8 @@ if __name__ == '__main__':
         group_mongodb.add_argument('--mongodb_admin_pw', default=None, type=str,
                                     conf_exclude=True,
                                    help='Mongodb administrator password.')
+        group_mongodb.add_argument('--mongodb_auth_db', default=None, type=str,
+                        help='')
 
     description = "Living Labs Challenge's Management"
     parser = confargparse.ConfArgParser(description=description,

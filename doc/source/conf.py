@@ -121,7 +121,7 @@ html_theme_options = {
     'source_link_position': 'footer',
     'navbar_links': [
             ("Website", "http://living-labs.net/", True),
-            ("Dashboard", "http://living-labs.net:5001/", True),
+            ("Dashboard", "http://dashboard.living-labs.net/", True),
 #            ("About", "http://living-labs.net/about/", True),
 #            ("LL'13", "http://living-labs.net/ll13/", True),
 #            ("LL'14", "http://living-labs.net/ll14/", True),

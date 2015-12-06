@@ -22,9 +22,9 @@ with this API. However, example clients are provided by the organization.
 For all operations, an API key is required. Also, we require you to sign an
 agreement. Details on that process will be shared once you sign up.
 The dashboard that you can use to obtain an API key is here:
-http://living-labs.net:5001/
+http://dashboard.living-labs.net/
 
-Our API is located at this location: http://living-labs.net:5000/api/.
+Our API is located at this location: http://api.living-labs.net/api/.
 
 .. note:: We have rate limited the API to 300 calls per minute or 10 calls per 
 	second, whichever hits first. Please do let us know if this is causing you
@@ -40,7 +40,7 @@ Our API is located at this location: http://living-labs.net:5000/api/.
 Query
 -----
 From each site that a participant signed up for (see 
-http://living-labs.net:5001/user/sites/), a sample of (N=100) queries is made
+http://dashboard.living-labs.net/user/sites/), a sample of (N=100) queries is made
 available. This endpoint allows for downloading these queries.
 
 After the train phase, new queries (and doclists) will be made available.

@@ -59,6 +59,8 @@ if __name__ == '__main__':
                         help='')
     group_mongodb.add_argument('--mongodb_user_pw', default=None, type=str,
                         help='')
+    group_mongodb.add_argument('--mongodb_auth_db', default=None, type=str,
+                        help='')
     args = parser.parse_args()
 
     print("Starting %s" % description)
@@ -70,7 +72,7 @@ if __name__ == '__main__':
 
     app.debug = args.debug
     db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db, user=args.mongodb_user,
-               password=args.mongodb_user_pw)
+               password=args.mongodb_user_pw, authenticationDatabase = args.mongodb_auth_db)
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(args.port, address=args.host)
     ioloop = IOLoop.instance()
