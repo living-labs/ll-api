@@ -23,7 +23,7 @@ Participating in the lab involves following these steps:
 #.	Sign up
 
 	#. 	If you  take part in CLEF `Register at CLEF <http://clef2015-labs-registration.dei.unipd.it/>`_ 
-	#.	`Register with the lab <http://living-labs.net:5001/user/register/>`_. You can do this at any moment.
+	#.	`Register with the lab <http://dashboard.living-labs.net/user/register/>`_. You can do this at any moment.
 	#.	Sign and send the lab the agreement form. You will receive a link to this form.
 	#.	Sign up for individual sites (use-cases) you want to obtain data for. You will receive a link by email to do so.
 
@@ -203,7 +203,7 @@ We start of with some imports and definitions. Replace :code:`KEY` with your own
 	import random
 	import datetime # needed for timestamp
 	
-	HOST = "http://living-labs.net:5000/api"
+	HOST = "http://api.living-labs.net/api"
 	KEY = "ABC-123"
 
 	QUERYENDPOINT = "participant/query"

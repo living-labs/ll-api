@@ -10,7 +10,7 @@ API.
 
 If all you want is to participate in the Lab, you do not necessarily need any
 of the following. Instead you could just go ahead and implement your client
-that talks to our API at http://living-labs.net:5000/api/.
+that talks to our API at http://api.living-labs.net/api/.
 However, the code we provide does include a simple baseline implementation 
 that talks to our API and that you may find useful.
 Furthermore, if you do install the API/dashboard/.. on your own machine,
@@ -72,7 +72,7 @@ In case you want to run your own version of the API (for testing purposes),
 you'll have to continue.
 
 You don't necessarily have to do that, our API is running here:
-http://living-labs.net:5000/api/
+http://api.living-labs.net/api/
 
 .. _setup_mongodb:
 

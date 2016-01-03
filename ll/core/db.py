@@ -65,11 +65,13 @@ def setup_db_users(host, port, username, user_password, db_name, adminname, admi
     print("Creating user")
     create_db_user(host, port, username, user_password, db_name, adminname, admin_password)
 
-def export_json(path, host, port, database, username, password):
+def export_json(path, host, port, database, username, password, authentication_database=None):
     # Create binary BSON dump from current database
     host_port = host + ":" + str(port)
-    subprocess.call(["mongodump","-u",username,"-p", password,"-d",database, "-o",path, "--host", host_port])
-
+    if authentication_database is None:
+        subprocess.call(["mongodump","-u",username,"-p", password,"-d",database, "-o",path, "--host", host_port])
+    else:
+        subprocess.call(["mongodump","-u",username,"-p", password,"-d",database, "-o",path, "--host", host_port, "--authenticationDatabase", authentication_database])
     # Convert BSON file to JSON files
     path_database = os.path.join(path,database)
     files=[]
@@ -81,14 +83,17 @@ def export_json(path, host, port, database, username, password):
                 subprocess.call(["bsondump", filename+".bson"], stdout=output_file)
 
 
-def import_json(path, host, port, database, username, password):
+def import_json(path, host, port, database, username, password, authentication_database=None):
     # Loop over all collections, they have their own json-file and json-metafile
     for collection in ["doc","feedback","historical","query","run","site","system","user"]:
         json_file=os.path.join(path,database,collection)+".json"
         # Import json database file for this collection
 
         host_port = host + ":" + str(port)
-        subprocess.call(["mongoimport", "-u", username, "-d", database, "-c", collection,"-p", password,"--file", json_file,"--host", host_port])
+        if authentication_database is None:
+            subprocess.call(["mongoimport", "-u", username, "-d", database, "-c", collection,"-p", password,"--file", json_file,"--host", host_port])
+        else:
+            subprocess.call(["mongoimport", "-u", username, "-d", database, "-c", collection,"-p", password,"--file", json_file,"--host", host_port, "--authenticationDatabase", authentication_database])
         # Import metadata (indexes) for this collection
         if collection != "system":
             import_metadata(path,database,collection)
