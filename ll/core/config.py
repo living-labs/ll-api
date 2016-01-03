@@ -23,6 +23,7 @@ config = {
     "URL_WEB": "http://doc.living-labs.net/en/latest/guide-participant.html",
     "URL_API": "http://living-labs.net:5000/api",
     "URL_DASHBOARD": "http://living-labs.net:5001",
+    "URL_REACTIVATION": "http://living-labs.net:5001/user/runs",
     "URL_DOC": "http://doc.living-labs.net",
     "URL_GIT": "https://bitbucket.org/living-labs/ll-api/",
     "URL_REGISTRATION_FORM": "http://living-labs.net/wp-content/uploads/2014/06/LLC14-Application-form.pdf",
@@ -58,6 +59,7 @@ config = {
     "ROLLBAR_API_KEY": "719ef6f2566f46af9b849fdbc9d43680",
     "ROLLBAR_DASHB0ARD_KEY": "ccf521ba5e49428ebc79bd82b14587fa",
     "ROLLBAR_ENV": "production",
-    "CLEANUP_INTERVAL_HOURS": 0.02,
-    "RUN_AGE_THRESHOLD_DAYS": 0.03
+    "CLEANUP_INTERVAL_HOURS": 0.005,
+    "RUN_AGE_THRESHOLD_DAYS": 0.00001,
+    "REACTIVATION_PERIOD_DAYS": 0.01
 }

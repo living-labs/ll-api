@@ -27,6 +27,8 @@ app = Flask(__name__)
 @app.before_first_request
 def init_rollbar():
     """init rollbar module"""
+    if app.debug:
+        return
     rollbar.init(
         # access token for the demo app: https://rollbar.com/demo
         core.config.config["ROLLBAR_DASHB0ARD_KEY"],

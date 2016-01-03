@@ -21,7 +21,8 @@ from werkzeug import check_password_hash
 
 from .. import core, requires_login
 from forms import LoginForm, RegisterForm, ForgotForm
-
+from bson import json_util
+import json
 mod = Blueprint('user', __name__, url_prefix='/user')
 
 
@@ -101,28 +102,28 @@ def runs():
     class RunsForm(Form):
         pass
 
-    for run in core.run.get_runs(g.user["_id"]):
+    field_to_run = {}
+
+    for run in core.run.get_outdated_runs(g.user["_id"]):
+        print "original run"
         print run
         default = False
-        if isinstance(run,list):
-            # If paired with timestamp
-            description = str(run[1])
-            runid = run[0]
-        else:
-            description = ""
-            runid = run
-
-        setattr(RunsForm, runid, BooleanField(runid,
-                                                     description=description,
-                                                     default=default))
-
+        creation_time = run['creation_time']
+        run_str = json.dumps(run, default=json_util.default)
+        field_id = str(run["_id"])
+        setattr(RunsForm, field_id, BooleanField(creation_time, description=run_str))
+        field_to_run[field_id] = run
     form = RunsForm(request.form)
     if form.validate_on_submit():
-        #sites = [k for k in form.data if form.data[k]]
-        #core.user.set_sites(g.user["_id"], sites)
-        #flash('Agreements to site terms have been saved.', 'alert-success')
-        return redirect(url_for('site.home'))
-    return render_template("user/runs.html", form=form, user=g.user)
+        print "form data:"
+        print form.data
+        selected_runs = [field_to_run[k] for k in form.data if form.data[k]]
+        print "following runs will be activated:"
+        print selected_runs
+        core.run.reactivate_runs(selected_runs)
+        flash('Outdated runs have been reactivated.', 'alert-success')
+        return redirect(url_for('user.home'))
+    return render_template("user/runs.html", form=form, user=g.user, config=core.config.config)
 
 @mod.route('/sites/', methods=['GET', 'POST'])
 @requires_login

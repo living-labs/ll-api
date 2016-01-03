@@ -23,7 +23,8 @@ import site
 import user
 import query
 import feedback
-
+import json
+from bson import json_util
 
 def get_ranking(site_id, site_qid):
     query = db.query.find_one({"site_id": site_id, "site_qid": site_qid})
@@ -39,7 +40,7 @@ def get_ranking(site_id, site_qid):
     random.shuffle(allruns)
     for userid, runid_pair in allruns:
         # Check if runid is paired with a timestamp (new format)
-        if isinstance(runid_pair,list):
+        if isinstance(runid_pair, list):
             runid, run_modified_time = runid_pair
         else:
             # Not paired with timestamp, only runid present (old format)
@@ -82,9 +83,9 @@ def add_run(key, qid, runid, doclist):
 
     if in_test_period and "type" in q and q["type"] == "test" \
             and "runs" in q and key in q["runs"]:
-                
+
         # Hack to always enable baseline participant to submit runs
-        if (key!="0EF9706FD1359FB8-A9GQJWD0XU04GO2R"):
+        if (key != "0EF9706FD1359FB8-A9GQJWD0XU04GO2R"):
             raise ValueError("For test queries you can only upload a run once "
                              "during a test period.")
     sites = user.get_sites(key)
@@ -108,7 +109,7 @@ def add_run(key, qid, runid, doclist):
         "runid": runid,
         "doclist": doclist,
         "creation_time": creation_time,
-        }
+    }
     db.run.remove({"runid": runid,
                    "qid": qid,
                    "userid": key})
@@ -145,7 +146,7 @@ def get_trec_run(runs, periodname, teamname):
         ndoc = len(runs[qid]["doclist"])
         for rank, d in enumerate(runs[qid]["doclist"]):
             trec.append("%s Q0 %s %d %d %s" % (qid, d["docid"], rank,
-                                               ndoc-rank, runname))
+                                               ndoc - rank, runname))
     return {"trec": "\n".join(trec),
             "name": runname}
 
@@ -162,8 +163,8 @@ def get_trec_qrel(feedbacks, periodname, rawcount=False):
                 if not d["docid"] in click_stat:
                     click_stat[d["docid"]] = [0, 0]
                 if "clicked" in d and (d["clicked"] is True or
-                                (isinstance(d["clicked"], list) and
-                                len(d["clicked"]) > 0)):
+                                           (isinstance(d["clicked"], list) and
+                                                    len(d["clicked"]) > 0)):
                     click_stat[d["docid"]][0] += 1
                 click_stat[d["docid"]][1] += 1
             count += 1
@@ -172,7 +173,7 @@ def get_trec_qrel(feedbacks, periodname, rawcount=False):
             if rawcount:
                 ctrs.append((click_stat[d][0], d))
             else:
-                ctrs.append((float(click_stat[d][0])/count, d))
+                ctrs.append((float(click_stat[d][0]) / count, d))
         for ctr, d in sorted(ctrs, reverse=True):
             if rawcount:
                 trec.append("%s 0 %s %d" % (qid, d, ctr))
@@ -233,13 +234,13 @@ def get_trec(site_id):
                                             rawcount=True))
     return trec_runs, trec_qrels, trec_qrels_raw
 
+
 # Remove all runs submitted by a certain participant
 def remove_runs_user(key):
-
     q = {"deleted": {"$ne": True}}
     queries = [query for query in db.query.find(q)]
-    #print "Before"
-    #print queries
+    # print "Before"
+    # print queries
     for query in queries:
         if "runs" in query:
             runs = query["runs"]
@@ -250,15 +251,15 @@ def remove_runs_user(key):
             # Update runs list
             query["runs"] = runs
             db.query.save(query)
-    #print "After"
-    #print [query for query in db.query.find(q)]
+    # print "After"
+    # print [query for query in db.query.find(q)]
 
     # Return resulting query list, with removed runs
     return [query for query in db.query.find(q)]
 
+
 # Get all runs by a certain user
 def get_runs(key):
-
     q = {"deleted": {"$ne": True}}
     queries = [query for query in db.query.find(q)]
     runs_user = []
@@ -269,3 +270,85 @@ def get_runs(key):
                 runs_user.append(runs[key])
     return runs_user
 
+
+# Get all outdated runs
+def get_outdated_runs(selected_user):
+    age_threshold = datetime.datetime.now() - datetime.timedelta(days=config["RUN_AGE_THRESHOLD_DAYS"])
+
+    # Get list of all queries
+    q = {"deleted": {"$ne": True}}
+    queries = [query for query in db.query.find(q)]
+    outdated_runs = []
+    for query in queries:
+        allruns = query["runs"].items()
+        for userid, runid_pair in allruns:
+            print userid
+            print selected_user
+            if userid == selected_user:
+                # Check if runid is paired with a timestamp (new format)
+                if isinstance(runid_pair, list):
+                    runid, run_modified_time = runid_pair
+                    if 'doclist_modified_time' in query:
+                        print "Run modified time: " + str(run_modified_time)
+                        print "Doclist modified time: " + str(query['doclist_modified_time'])
+                        if run_modified_time < query['doclist_modified_time']:
+                            print("Run older than latest doclist")
+                            # Look up full run and append this to outdated runs list
+                            full_run = db.run.find_one({"runid": runid,
+                                                        "qid": query['_id'],
+                                                        "userid": userid})
+                            outdated_runs.append(full_run)
+
+                            continue
+                    if run_modified_time < age_threshold:
+                        print("Run older than threshold")
+                        # Look up full run and append this to outdated runs list
+                        full_run = db.run.find_one({"runid": runid,
+                                                    "qid": query['_id'],
+                                                    "userid": userid})
+                        outdated_runs.append(full_run)
+
+                        continue
+                else:
+                    print("Run not paired with timestamp, not able to clean up")
+                    continue
+
+    return outdated_runs
+
+
+##TODO: Receive 'runs' that consists of pairs (qid,runid)
+# Reactivate designated outdated runs
+def reactivate_runs(runs):
+    reactivated_runs = []
+    for run in runs:
+        # Run dict is encoded as json string, decode
+
+        new_creation_time = datetime.datetime.now()
+        new_run = dict(run) # copy of current run
+        new_run["creation_time"] = new_creation_time
+
+        db.run.remove(run)
+        db.run.save(new_run)
+
+        qid = run["qid"]
+        userid = run["userid"]
+        q = db.query.find_one({"_id": qid})
+        runid = run["runid"]
+
+        if not q:
+            raise LookupError("Query does not exist: qid = '%s'" % qid)
+        if "runs" in q:
+            runs = q["runs"]
+        else:
+            runs = {}
+        runs[userid] = (runid, new_creation_time)
+
+        q["runs"] = runs
+        db.query.save(q)
+        print "Updated run"
+        print new_run
+        print "Updated query runs"
+        print runs
+
+        reactivated_runs += new_run
+    return reactivated_runs

@@ -18,8 +18,10 @@
     	Outdated runs
     {% endblock %}
     {% block content %}
-      Runs shown on this page are outdated and will soon be deactivated. You can reactivate them for a period of 30 days
-        by clicking the Reactivate button.
+      Runs shown on this page are outdated, because the document list is outdated,
+        or the run is older than {{ config.RUN_AGE_THRESHOLD_DAYS }} days.
+        Outdated runs will be deleted after a reactivation period of {{ config.REACTIVATION_PERIOD_DAYS }} days.
+        You can reactivate them by clicking the Reactivate button.
       {% from "forms/macros.html" import render_field %}
       <form method="POST" action="." class="form">
         {{ form.csrf_token }}
@@ -27,7 +29,9 @@
 		  <thead>
 		    <tr>
 		      <th>Reactivated</th>
-		      <th>Run</th>
+              <th>Run ID</th>
+              <th>Site ID</th>
+              <th>Query ID</th>
 		      <th>Timestamp</th>
 		    </tr>
 		  </thead>
@@ -36,8 +40,8 @@
 			    {% if field.name != "csrf_token" %}
 			    <tr>
 			        <td>{{ field }}</td>
-			        <td>{{ field.label }}{% if field.is_robot %}<img src="/static/icon_robot.svg" style="height: 14px; position: relative;top: -3px;left: 2px;"/>{% endif %}</td>
-			        <td>{{ field.description }}</td>
+			        <td>{{ field.label }}</td>
+                    <td>{{ field.description }}</td>
 			    </tr>
 			    {% endif %}
 			{% endfor %}
