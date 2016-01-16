@@ -37,12 +37,12 @@ class ApiResource(Resource):
             abort(status,
                   message=str(message).strip().strip(".") + ".",
                   status=status,
-                  documentaton=core.config.config["URL_DOC"])
+                  documentation=core.config.config["URL_DOC"])
         else:
             abort(status,
                   message=str(message).strip().strip(".") + ".",
                   status=status,
-                  documentaton=core.config.config["URL_DOC"],
+                  documentation=core.config.config["URL_DOC"],
                   traceback=[self.replace_tb(l) for l in tb.split("\n") if l])
 
     def check_fields(self, o, required_fields, optional_fields=None,

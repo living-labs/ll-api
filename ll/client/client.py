@@ -19,17 +19,18 @@ import argparse
 import requests
 import time
 import random
+from ll.core.config import config
 
 HEADERS = {'content-type': 'application/json'}
 
 
 class Client():
-    description = "Living Labs Challenge's Client"
+    description = "Living Labs for " + config["COMPETITION_NAME"] + " Client"
 
     def __init__(self):
         self.parser = argparse.ArgumentParser(description=self.description)
         self.parser.add_argument('--host', dest='host',
-                                default='http://living-labs.net',
+                                default=config["URL_API"],
                                 help='Host to listen on.')
         self.parser.add_argument('--port', dest='port', default=5000, type=int,
                             help='Port to connect to.')

@@ -35,10 +35,11 @@ from ll.core.db import db
 from ll.api import app, cron
 import ll.api.participant
 import ll.api.site
+from ll.core.config import config
 
 
 if __name__ == '__main__':
-    description = "Living Labs Challenge's API Server"
+    description = "Living Labs for " + config["COMPETITION_NAME"] + " API Server"
     parser = confargparse.ConfArgParser(description=description,
                                         section="main")
     parser.add_argument('--debug', dest='debug', action='store_true',

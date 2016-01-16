@@ -18,6 +18,7 @@
 import json
 import os
 from client import Client
+from ll.core.config import config
 
 
 QUERYENDPOINT    = "participant/query"
@@ -30,7 +31,7 @@ FEEDBACKENDPOINT = "participant/feedback"
 
 class Participant(Client):
     def __init__(self):
-        self.description = "Living Labs Challenge's Participant Client"
+        self.description = "Living Labs " + config["COMPETITION_NAME"] + " Participant Client"
         Client.__init__(self)
         path = os.path.dirname(os.path.realpath(__file__))
         self.parser.add_argument('-k', '--key', type=str, required=True,

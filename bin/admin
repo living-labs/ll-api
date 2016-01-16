@@ -128,7 +128,7 @@ def db(args, parser):
 def trec(args, parser):
     # Log in to database
     ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
-                            args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
+                            args.mongodb_user, args.mongodb_user_pw, authenticationDatabase = args.mongodb_auth_db)
     
     runs, qrels, qrels_raw = ll.core.run.get_trec(args.site_id)
     os.makedirs(os.path.join(args.dir, args.site_id, "run"))

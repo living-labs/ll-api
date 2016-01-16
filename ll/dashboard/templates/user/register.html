@@ -18,7 +18,7 @@
     	Register
     {% endblock %}
     {% block content %}
-      <p>Please use the form below to register to the CLEF Living Lab.</p>
+      <p>Please use the form below to register to Living Labs for {{ config.COMPETITION_NAME }}.</p>
       {% from "forms/macros.html" import render_field %}
       <form method="POST" action="." class="form">
         {{ form.csrf_token }}

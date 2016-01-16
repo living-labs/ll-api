@@ -29,7 +29,7 @@ def home():
                  s["_id"] in core.user.get_sites(g.user["_id"])]
     else:
         sites = core.site.get_sites()
-    return render_template("site/sites.html", user=g.user, sites=sites)
+    return render_template("site/sites.html", user=g.user, sites=sites, config=core.config.config)
 
 
 @mod.route('/<site_id>')
@@ -53,6 +53,7 @@ def site(site_id):
     return render_template("site/site.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            stats=stats)
 
 
@@ -63,6 +64,7 @@ def query(site_id):
     return render_template("site/query.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            queries=core.db.db.query.find({"site_id": site_id}))
 
 
@@ -78,6 +80,7 @@ def query_detail(site_id, qid):
     return render_template("site/query_detail.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            historical=historical,
                            query=core.db.db.query.find_one({"site_id": site_id,
                                                             "_id": qid}))
@@ -90,6 +93,7 @@ def doc(site_id):
     return render_template("site/doc.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            docs=core.db.db.doc.find({"site_id": site_id}))
 
 
@@ -105,6 +109,7 @@ def doc_detail(site_id, docid):
     return render_template("site/doc_detail.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            doc=core.db.db.doc.find_one({"site_id": site_id,
                                                     "_id": docid}),
                            stats=stats)

@@ -15,6 +15,7 @@
 
 import sys
 import argparse
+from ll.core.config import config
 
 def logparser():
     for line in sys.stdin:
@@ -31,7 +32,7 @@ def logparser():
 argparser = argparse.ArgumentParser(description="Parse uva.nl access logs for "
                                  "queries to send to the Living Labs API.")
 argparser.add_argument("--api", "-a", type=str,
-                    default="http://living-labs.net/api/",
+                    default=config["URL_API"],
                     help="Living labs API location (default: %(default)s).")
 argparser.add_argument("--key", "-k", type=str,
                     default="KEY-123",

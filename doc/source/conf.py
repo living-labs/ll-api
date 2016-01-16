@@ -20,7 +20,7 @@ import sphinx_bootstrap_theme
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.insert(0, os.path.abspath('../../'))
-
+from ll.core.config import config
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -51,7 +51,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Living Labs Documentation'
-copyright = u'2014-2015, Living Labs'
+copyright = u'2014-2016, Living Labs'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -120,8 +120,8 @@ html_theme_options = {
     'navbar_site_name': 'Documentation',
     'source_link_position': 'footer',
     'navbar_links': [
-            ("Website", "http://living-labs.net/", True),
-            ("Dashboard", "http://dashboard.living-labs.net/", True),
+            ("Website", config["URL_WEB"], True),
+            ("Dashboard", config["URL_DASHBOARD"], True),
 #            ("About", "http://living-labs.net/about/", True),
 #            ("LL'13", "http://living-labs.net/ll13/", True),
 #            ("LL'14", "http://living-labs.net/ll14/", True),

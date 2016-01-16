@@ -32,10 +32,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.realpath(__file__),
 
 from ll.core.db import db
 from ll.dashboard import app
-
+from ll.core.config import config
 
 if __name__ == '__main__':
-    description = "Living Labs Challenge's Dashboard"
+    description = "Living Labs for " + config["COMPETITION_NAME"] + " Dashboard"
     parser = confargparse.ConfArgParser(description=description,
                                         section="main")
     parser.add_argument('--debug', dest='debug', action='store_true',

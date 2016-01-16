@@ -10,7 +10,8 @@ API.
 
 If all you want is to participate in the Lab, you do not necessarily need any
 of the following. Instead you could just go ahead and implement your client
-that talks to our API at http://api.living-labs.net/api/.
+that talks to our API at http://api.living-labs.net/api/ (for the CLEF competition)
+or http://api.trec-open-search.org/api (for the TREC OpenSearch competition).
 However, the code we provide does include a simple baseline implementation 
 that talks to our API and that you may find useful.
 Furthermore, if you do install the API/dashboard/.. on your own machine,
@@ -20,7 +21,6 @@ In case you have any comments or questions, please do not
 hesitate to file an issue here: https://bitbucket.org/living-labs/ll-api/issues.
 Or, you can contact the main developer directly at anne.schuth@uva.nl.
 
-For more information on the CLEF Lab, see http://living-labs.net/clef-lab/.
 Documentation (including this tutorial) can be found here:
 http://doc.living-labs.net/en/latest/
 
@@ -72,7 +72,7 @@ In case you want to run your own version of the API (for testing purposes),
 you'll have to continue.
 
 You don't necessarily have to do that, our API is running here:
-http://api.living-labs.net/api/
+http://api.living-labs.net/api/ (for CLEF) or http://api.trec-open-search.org (for TREC OpenSearch).
 
 .. _setup_mongodb:
 
@@ -126,14 +126,6 @@ Now, we use the admin tool to generate a configuration file containing the datab
 The tool will export the database username and password to the :code:`db.ini` file. Remember to never add this file to a code repository,
 that would be a severe security threat.
 
-Besides the database configuration file :code:`db.ini`, there is a general configuration
-file. We make a local copy of this configuration file, :code:`livinglabs.local.ini`,
-for further use:
-
-.. sourcecode:: bash
-
-    $ cp config/livinglabs.ini config/livinglabs.local.ini
-
 Non-Authenticated
 ^^^^^^^^^^^^^^^^^
 
@@ -147,12 +139,29 @@ authentication. Start a MongoDB deamon as follows:
 
 Run the API
 -----------
-If you have not done so yet, make a local copy of your general configuration
-file:
+We make a local copy of the user settings file, :code:`config/livinglabs.ini`,
+so it is safer to make changes to it later:
 
 .. sourcecode:: bash
 
     $ cp config/livinglabs.ini config/livinglabs.local.ini
+
+Furthermore, there is a configuration file :code:`ll/core/config.py`, which stores API constants like
+web adresses, e-mail adresses and competition deadlines. Depending on the competition you would like
+to run this API for (CLEF or TREC OpenSearch), there is a template configuration file template which you could install.
+
+For CLEF, issue:
+
+.. sourcecode:: bash
+
+    $ cp ll/core/config_clef.py ll/core/config.py
+
+
+For TREC OpenSearch, issue:
+
+.. sourcecode:: bash
+
+    $ cp ll/core/config_trec_opensearch.py ll/core/config.py
     
 To start the API, run the following command: 
 
@@ -224,7 +233,7 @@ To run a site client and upload queries and documents, you can do the following:
 
    $ ./bin/client-site --host localhost --key SITEKEY -q -d
 
-This assumes the API runs on :code:`localhost`, your own computer. If the :code:`--host` argument is omitted,  the default online Living Labs API (http://living-labs.net) is used.
+This assumes the API runs on :code:`localhost`, your own computer. If the :code:`--host` argument is omitted, a default online API (specified in :code:`ll/core/config.py`) is used.
 
 It will take TREC queries/runs/document (see :code:`-h` for file locations and
 how to change them) as a basis. Alternatively, with the :code:`--letor` switch, 
