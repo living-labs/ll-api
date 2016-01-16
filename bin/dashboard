@@ -79,7 +79,7 @@ if __name__ == '__main__':
     app.config['RECAPTCHA_PRIVATE_KEY'] = args.recaptchaprivate
 
     db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db, user=args.mongodb_user,
-               password=args.mongodb_user_pw, authentication_database = args.mongodb_auth_db)
+               password=args.mongodb_user_pw, authenticationDatabase = args.mongodb_auth_db)
     
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(args.port, address=args.host)
