@@ -23,6 +23,7 @@ import random
 import codecs
 from numpy import log2, mean
 from client import Client
+from ll.core.config import config
 
 PCLICK = {0: 0.05,
           1: 0.5,
@@ -41,7 +42,7 @@ FEEDBACKENDPOINT = "site/feedback"
 
 class Site(Client):
     def __init__(self):
-        self.description = "Living Labs Challenge's Site Client"
+        self.description = "Living Labs " + config["COMPETITION_NAME"] + " Site Client"
         Client.__init__(self)
         path = os.path.dirname(os.path.realpath(__file__))
 

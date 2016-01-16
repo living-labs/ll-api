@@ -22,7 +22,7 @@
     <tbody>
     <tr>
       <td>Qid</td>
-      <td><a href="http://api.living-labs.net/api/participant/query/{{user._id}}"><span class="glyphicon glyphicon-flash"></span></a></td>
+      <td><a href="{{ config.URL_API }}/participant/query/{{user._id}}"><span class="glyphicon glyphicon-flash"></span></a></td>
       <td>
       	{{ query._id }} 
       </td>
@@ -49,12 +49,12 @@
     </tr>
     <tr>
       <td>#docs this query has in the doclist</td>
-      <td><a href="http://api.living-labs.net/api/participant/doclist/{{user._id}}/{{ query._id }}"><span class="glyphicon glyphicon-flash"></span></a></td>
+      <td><a href="{{ config.URL_API }}/participant/doclist/{{user._id}}/{{ query._id }}"><span class="glyphicon glyphicon-flash"></span></a></td>
       <td>{{ query.doclist|length }} ({% for d in query.doclist %} <a href="/site/{{ site._id }}/doc/{{ d }}">{{ d }}</a>, {% endfor %})</td>
     </tr>
     <tr>
       <td>Historical feedback</td>
-      <td><a href="http://api.living-labs.net/api/participant/historical/{{user._id}}/{{ query._id }}"><span class="glyphicon glyphicon-flash"></span></a></td>
+      <td><a href="{{ config.URL_API }}/participant/historical/{{user._id}}/{{ query._id }}"><span class="glyphicon glyphicon-flash"></span></a></td>
       <td>{{ historical.doclist|length }} ({% for d in historical.doclist %} <a href="/site/{{ site._id }}/doc/{{ d.docid }}">{{ d.docid }}</a>: {{d.clicked}}, {% endfor %})
       </td>
     </tr>

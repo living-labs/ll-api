@@ -63,7 +63,7 @@ def admin():
                                     } for site in sites
                           }
              }
-    return render_template("admin/admin.html", user=g.user, stats=stats)
+    return render_template("admin/admin.html", user=g.user, stats=stats, config=core.config.config)
 
 
 @mod.route('/outcome/<site_id>')
@@ -88,4 +88,4 @@ def outcome(site_id):
                                         "user": participant}))
     outcomes = [o for _, o in sorted(outcomes, reverse=True)]
     return render_template("admin/outcome.html", user=g.user,
-                           outcomes=outcomes, site_id=site_id)
+                           outcomes=outcomes, site_id=site_id, config=core.config.config)

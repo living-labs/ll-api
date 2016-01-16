@@ -25,7 +25,7 @@ mod = Blueprint('participant', __name__, url_prefix='/participant')
 def home():
     participants = core.user.get_participants()
     return render_template("participant/participants.html", user=g.user,
-                           participants=participants)
+                           participants=participants, config=core.config.config)
 
 
 @mod.route('/<email>')
@@ -49,7 +49,8 @@ def participant(email):
     return render_template("participant/participant.html",
                            user=g.user,
                            participant=participant,
-                           stats=stats)
+                           stats=stats,
+                           config=core.config.config)
 
 
 @mod.route('/<email>/delete')
@@ -122,6 +123,7 @@ def query(site_id):
     return render_template("participant/query.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            queries=core.db.db.query.find({"site_id": site_id}))
 
 
@@ -132,6 +134,7 @@ def query_detail(site_id, qid):
     return render_template("participant/query_detail.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            query=core.db.db.query.find_one({"site_id": site_id,
                                                             "_id": qid}))
 
@@ -143,6 +146,7 @@ def doc(site_id):
     return render_template("participant/doc.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            docs=core.db.db.doc.find({"site_id": site_id}))
 
 
@@ -158,6 +162,7 @@ def doc_detail(site_id, docid):
     return render_template("participant/doc_detail.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            doc=core.db.db.doc.find_one({"site_id": site_id,
                                                     "_id": docid}),
                            stats=stats)

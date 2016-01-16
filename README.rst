@@ -1,7 +1,7 @@
 README
 ======
 
-This repository holds code for the CLEF Living Labs for IR Evaluation (LL4IR).
+This repository holds code for Living Labs for IR Evaluation (LL4IR).
 
 In particular, this repository contains:
 
@@ -12,8 +12,13 @@ In particular, this repository contains:
 	
 For more information, consult:
 
-- Guide for CLEF participants: http://doc.living-labs.net/en/latest/guide-participant.html
-- CLEF LL4IR page: http://living-labs.net/clef-lab/
+- Guide for participants: http://doc.living-labs.net/en/latest/guide-participant.html
+
+- At the moment, there are two competitions which use Living labs
+
+  - CLEF LL4IR page: http://living-labs.net/clef-lab/
+  - TREC OpenSearch page: http://trec-open-search.org/about/
+
 - General Documentation: http://doc.living-labs.net
 
 

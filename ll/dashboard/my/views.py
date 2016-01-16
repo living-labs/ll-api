@@ -29,7 +29,7 @@ def my():
                  s["_id"] in core.user.get_sites(g.user["_id"])]
     else:
         sites = core.site.get_sites()
-    return render_template("my/my.html", user=g.user, sites=sites)
+    return render_template("my/my.html", user=g.user, sites=sites,config=core.config.config)
 
 
 @mod.route('/<site_id>')
@@ -56,4 +56,5 @@ def site(site_id):
     return render_template("my/site.html",
                            user=g.user,
                            site=site,
+                           config=core.config.config,
                            stats=stats)

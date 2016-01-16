@@ -6,7 +6,7 @@ API Reference for Participants
 .. note:: Please refer the :ref:`guide` before reading this.
 
 
-We provide a basic API for participants of the CLEF Living Labs  to perform
+We provide a basic API for participants of Living Labs to perform
 several actions such as obtaining a key, queries, documents and feedback. The
 API can also be used to update runs. Everything is implemented as HTTP request,
 and we use the request types GET, HEAD and PUT. We try to throw appropriate 4XX
@@ -22,9 +22,10 @@ with this API. However, example clients are provided by the organization.
 For all operations, an API key is required. Also, we require you to sign an
 agreement. Details on that process will be shared once you sign up.
 The dashboard that you can use to obtain an API key is here:
-http://dashboard.living-labs.net/
+http://dashboard.living-labs.net/ (for CLEF) or http://dashboard.trec-open-search.org/ (for TREC OpenSearch).
 
-Our API is located at this location: http://api.living-labs.net/api/.
+Our API is located at this location: http://api.living-labs.net/api/ (for CLEF) or http://api.trec-open-search.org/api/
+(for TREC OpenSearch).
 
 .. note:: We have rate limited the API to 300 calls per minute or 10 calls per 
 	second, whichever hits first. Please do let us know if this is causing you
@@ -39,8 +40,8 @@ Our API is located at this location: http://api.living-labs.net/api/.
 
 Query
 -----
-From each site that a participant signed up for (see 
-http://dashboard.living-labs.net/user/sites/), a sample of (N=100) queries is made
+From each site that a participant signed up for (see the sites page for your
+user account on the dashboard), a sample of (N=100) queries is made
 available. This endpoint allows for downloading these queries.
 
 After the train phase, new queries (and doclists) will be made available.

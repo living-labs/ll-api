@@ -32,10 +32,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.realpath(__file__),
 
 from ll.core.db import db
 from ll.dashboard import app
-
+from ll.core.config import config
 
 if __name__ == '__main__':
-    description = "Living Labs Challenge's Dashboard"
+    description = "Living Labs for " + config["COMPETITION_NAME"] + " Dashboard"
     parser = confargparse.ConfArgParser(description=description,
                                         section="main")
     parser.add_argument('--debug', dest='debug', action='store_true',
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     app.config['RECAPTCHA_PRIVATE_KEY'] = args.recaptchaprivate
 
     db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db, user=args.mongodb_user,
-               password=args.mongodb_user_pw, authentication_database = args.mongodb_auth_db)
+               password=args.mongodb_user_pw, authenticationDatabase = args.mongodb_auth_db)
     
     http_server = HTTPServer(WSGIContainer(app))
     http_server.listen(args.port, address=args.host)
