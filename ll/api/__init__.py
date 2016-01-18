@@ -32,9 +32,9 @@ from ll.core.db import db
 from ll.core.config import config
 from ll.core.user import send_email, get_user
 
+import pickle
 
-
-def db_cleanup():
+def db_cleanup_old():
     print "Database cleanup task started"
     age_threshold = datetime.datetime.now() - datetime.timedelta(days=config["RUN_AGE_THRESHOLD_DAYS"])
     reactivation_period = datetime.timedelta(days=config["REACTIVATION_PERIOD_DAYS"])
@@ -54,17 +54,15 @@ def db_cleanup():
                     print "Run modified time: " + str(run_modified_time)
                     print "Doclist modified time: " + str(query['doclist_modified_time'])
                     # Definitive delete after reactivation period
-                    if datetime.datetime.now() - query['doclist_modified_time'] >= reactivation_period:
-                        # Assumption: The doclist is as old as the last cron job.
-                        # Thus, if the doclist is 7 days old, then the warning was given 7 days ago,
-                        # so then you are past the reactivation period.
-                        # This assumption is true if the cron job is performed regularly.
-                        print "Run is now past reactivation period. Delete."
+                    if query['doclist_modified_time'] - run_modified_time >= reactivation_period:
+                        # Assumption: The cronjob is performed regularly, otherwise the
+                        # reactivation period is shortened
+                        print "Run is now past reactivation period, document list obsolete. Delete."
                         run_user = get_user(userid)
                         run_email = run_user["email"]
                         run_teamname = run_user["teamname"]
                         send_email({'email': run_email, 'teamname': run_teamname},
-                               "Your run " + runid + " is past the reactivation period and will be deleted.",
+                               "Your run " + runid + " is past the reactivation period (document list obsolete) and will be deleted.",
                                "Run deleted")
                     # First warning, start of reactivation period
                     elif run_modified_time < query['doclist_modified_time']:
@@ -73,9 +71,9 @@ def db_cleanup():
                         run_email = run_user["email"]
                         run_teamname = run_user["teamname"]
                         send_email({'email': run_email, 'teamname': run_teamname},
-                                   "Your run " + runid + " is older than the corresponding doclist, it will be deactivated in 7 days. If this run is valuable, you can reactivate it via " +
+                                   "Your run " + runid + " is older than the corresponding document list, it will be deactivated in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
                                    config[
-                                       "URL_REACTIVATION"] + " inside the reactivation period of 7 days. After 7 days, it is not possible to reactivate anymore.",
+                                       "URL_REACTIVATION"] + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
                                    "Outdated run")
 
                         continue
@@ -86,7 +84,7 @@ def db_cleanup():
                     run_email = run_user["email"]
                     run_teamname = run_user["teamname"]
                     send_email({'email': run_email, 'teamname': run_teamname},
-                               "Your run " + runid + " is past the reactivation period and will be deleted.",
+                               "Your outdated run " + runid + " is past the reactivation period and will be deleted.",
                                "Run deleted")
                     continue
                 # First warning, start of reactivation period
@@ -96,22 +94,94 @@ def db_cleanup():
                     run_email = run_user["email"]
                     run_teamname = run_user["teamname"]
                     send_email({'email': run_email, 'teamname': run_teamname},
-                               "Your run " + runid + " is older than the set threshold, it will be deactivated in 7 days. If this run is valuable, you can reactivate it via " +
-                               config[
-                                   "URL_REACTIVATION"] + " inside the reactivation period of 7 days. After 7 days, it is not possible to reactivate anymore.",
+                               "Your run " + runid + " is older than the set age threshold of " + str(config["RUN_AGE_THRESHOLD_DAYS"]) + " days. The run will be deleted in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
+                               str(config[
+                                   "URL_REACTIVATION"]) + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
                                "Outdated run")
                     continue
             else:
                 print("Run not paired with timestamp, not able to clean up")
                 continue
 
+def db_cleanup():
+    print "Database cleanup task started"
+    age_threshold = datetime.datetime.now() - datetime.timedelta(days=config["RUN_AGE_THRESHOLD_DAYS"])
+    reactivation_period = datetime.timedelta(days=config["REACTIVATION_PERIOD_DAYS"])
+
+    # First delete runs, then notify outdated. Because there is overlap:
+    # deletable runs is a subset of outdated runs
+    deletable_runs_age, deletable_runs_doclist = core.run.get_deletable_runs()
+
+    for run in deletable_runs_age:
+        print "Run is now past reactivation period. Delete."
+        db.user
+        run_user = get_user(run["userid"])
+        run_email = run_user["email"]
+        run_teamname = run_user["teamname"]
+        send_email({'email': run_email, 'teamname': run_teamname},
+                   "Your outdated run " + run["runid"] + " is past the reactivation period and will be deleted.",
+                   "Run deleted")
+
+    for run in deletable_runs_doclist:
+        print "Run is now past reactivation period, document list obsolete. Delete."
+        run_user = get_user(run["userid"])
+        run_email = run_user["email"]
+        run_teamname = run_user["teamname"]
+        send_email({'email': run_email, 'teamname': run_teamname},
+               "Your run " + run["runid"] + " is past the reactivation period (document list obsolete) and will be deleted.",
+               "Run deleted")
+
+    outdated_runs_age, outdated_runs_doclist = core.run.get_outdated_runs()
+
+    for run in outdated_runs_age:
+        print("Run older than threshold, send e-mail: ", run["runid"], run["creation_time"])
+        run_user = get_user(run["userid"])
+        run_email = run_user["email"]
+        run_teamname = run_user["teamname"]
+        send_email({'email': run_email, 'teamname': run_teamname},
+                   "Your run " + run["runid"] + " is older than the set age threshold of " + str(config["RUN_AGE_THRESHOLD_DAYS"]) + " days. The run will be deleted in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
+                   str(config[
+                       "URL_REACTIVATION"]) + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
+                   "Outdated run")
+
+    for run in outdated_runs_doclist:
+        print("Run older than latest doclist, send email: ", run["runid"], run["creation_time"])
+        run_user = get_user(run["userid"])
+        run_email = run_user["email"]
+        run_teamname = run_user["teamname"]
+        send_email({'email': run_email, 'teamname': run_teamname},
+                   "Your run " + run["runid"] + " is older than the corresponding document list, it will be deactivated in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
+                   config[
+                       "URL_REACTIVATION"] + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
+                   "Outdated run")
+
+
+def calculate_statistics():
+    print "Calculate statistics"
+
+    # Calculate site statistics
+    sites = core.site.get_sites()
+    for site in sites:
+        site_id = site["_id"]
+        feedbacks = core.db.db.feedback.find({"site_id": site_id})
+        clicks = 0
+
+        stats = {
+                 "query": core.db.db.query.find({"site_id": site_id}).count(),
+                 "doc": core.db.db.doc.find({"site_id": site_id}).count(),
+                 "impression": feedbacks.count(),
+                 "click": clicks,
+        }
+        stats_file = "stats_site_" + site_id + ".p"
+        pickle.dump(stats,open(stats_file,"wb"))
+
 
 app = Flask(__name__)
 api = Api(app, catch_all_404s=True)
 
 cron = BackgroundScheduler()
-cron.add_job(db_cleanup, 'interval', id='job1', hours=config["CLEANUP_INTERVAL_HOURS"])
-
+cron.add_job(db_cleanup, 'interval', id='cleanjob', hours=config["CLEANUP_INTERVAL_HOURS"])
+cron.add_job(calculate_statistics, 'interval', id='statjob', hours=config["CALC_STATS_INTERVAL_HOURS"])
 
 
 @app.before_first_request

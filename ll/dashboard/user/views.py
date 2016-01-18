@@ -104,15 +104,27 @@ def runs():
 
     field_to_run = {}
 
-    for run in core.run.get_outdated_runs(g.user["_id"]):
+    outdated_runs_age, outdated_runs_doclist = core.run.get_outdated_runs(g.user["_id"])
+
+    for run in outdated_runs_age:
         print "original run"
         print run
         default = False
         creation_time = run['creation_time']
-        run_str = json.dumps(run, default=json_util.default)
+        run_str = json.dumps(run, default=json_util.default) + " Reason: run age."
         field_id = str(run["_id"])
         setattr(RunsForm, field_id, BooleanField(creation_time, description=run_str))
         field_to_run[field_id] = run
+    for run in outdated_runs_doclist:
+        print "original run"
+        print run
+        default = False
+        creation_time = run['creation_time']
+        run_str = json.dumps(run, default=json_util.default) + " Reason: old doclist."
+        field_id = str(run["_id"])
+        setattr(RunsForm, field_id, BooleanField(creation_time, description=run_str))
+        field_to_run[field_id] = run
+
     form = RunsForm(request.form)
     if form.validate_on_submit():
         print "form data:"

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Living Labs Challenge. If not, see <http://www.gnu.org/licenses/>.
 
-from slugify import slugify
+import slugify
 from db import db
 from config import config
 import random
@@ -23,8 +23,6 @@ import site
 import user
 import query
 import feedback
-import json
-from bson import json_util
 
 def get_ranking(site_id, site_qid):
     query = db.query.find_one({"site_id": site_id, "site_qid": site_qid})
@@ -140,7 +138,7 @@ def get_run(key, qid):
 
 
 def get_trec_run(runs, periodname, teamname):
-    runname = slugify(unicode("%s %s" % (periodname, teamname)))
+    runname = slugify.slugify(unicode("%s %s" % (periodname, teamname)))
     trec = []
     for qid in sorted(runs.keys()):
         ndoc = len(runs[qid]["doclist"])
@@ -152,7 +150,7 @@ def get_trec_run(runs, periodname, teamname):
 
 
 def get_trec_qrel(feedbacks, periodname, rawcount=False):
-    periodname = slugify(unicode(periodname))
+    periodname = slugify.slugify(unicode(periodname))
     trec = []
 
     for qid in sorted(feedbacks.keys()):
@@ -270,21 +268,73 @@ def get_runs(key):
                 runs_user.append(runs[key])
     return runs_user
 
-
-# Get all outdated runs
-def get_outdated_runs(selected_user):
+# Get outdated runs which are past the reactivation period and can be deleted.
+# With argument: get runs for specific user. Without argument: get all deletable runs
+def get_deletable_runs(selected_user=None):
     age_threshold = datetime.datetime.now() - datetime.timedelta(days=config["RUN_AGE_THRESHOLD_DAYS"])
+    reactivation_period = datetime.timedelta(days=config["REACTIVATION_PERIOD_DAYS"])
 
     # Get list of all queries
     q = {"deleted": {"$ne": True}}
     queries = [query for query in db.query.find(q)]
-    outdated_runs = []
+    deletable_runs_age = []
+    deletable_runs_doclist = []
     for query in queries:
         allruns = query["runs"].items()
         for userid, runid_pair in allruns:
             print userid
             print selected_user
-            if userid == selected_user:
+            if selected_user == None or userid == selected_user:
+                # Check if runid is paired with a timestamp (new format)
+                if isinstance(runid_pair, list):
+                    runid, run_modified_time = runid_pair
+                    if 'doclist_modified_time' in query:
+                        print "Run modified time: " + str(run_modified_time)
+                        print "Doclist modified time: " + str(query['doclist_modified_time'])
+                        if run_modified_time < (query['doclist_modified_time'] - reactivation_period):
+                            print("Run older than latest doclist")
+                            # Look up full run and append this to outdated runs list
+                            full_run = db.run.find_one({"runid": runid,
+                                                        "qid": query['_id'],
+                                                        "userid": userid})
+                            deletable_runs_doclist.append(full_run)
+
+                            continue
+                    if run_modified_time < (age_threshold - reactivation_period):
+
+                        print "Run older than threshold + reactivation period."
+                        print "Run modified time: " + str(run_modified_time)
+                        print "Age threshold - reaction period: " + str(age_threshold - reactivation_period)
+                        # Look up full run and append this to outdated runs list
+                        full_run = db.run.find_one({"runid": runid,
+                                                    "qid": query['_id'],
+                                                    "userid": userid})
+                        deletable_runs_age.append(full_run)
+
+                        continue
+                else:
+                    print("Run not paired with timestamp, not able to clean up")
+                    continue
+
+    return (deletable_runs_age, deletable_runs_doclist)
+
+
+# Get all outdated runs: runs which are older than their doclist or older than a threshold
+# With argument: get runs for specific user. Without argument: get all outdated runs
+def get_outdated_runs(selected_user=None):
+    age_threshold = datetime.datetime.now() - datetime.timedelta(days=config["RUN_AGE_THRESHOLD_DAYS"])
+
+    # Get list of all queries
+    q = {"deleted": {"$ne": True}}
+    queries = [query for query in db.query.find(q)]
+    outdated_runs_age = []
+    outdated_runs_doclist = []
+    for query in queries:
+        allruns = query["runs"].items()
+        for userid, runid_pair in allruns:
+            print userid
+            print selected_user
+            if selected_user == None or userid == selected_user:
                 # Check if runid is paired with a timestamp (new format)
                 if isinstance(runid_pair, list):
                     runid, run_modified_time = runid_pair
@@ -297,7 +347,7 @@ def get_outdated_runs(selected_user):
                             full_run = db.run.find_one({"runid": runid,
                                                         "qid": query['_id'],
                                                         "userid": userid})
-                            outdated_runs.append(full_run)
+                            outdated_runs_doclist.append(full_run)
 
                             continue
                     if run_modified_time < age_threshold:
@@ -306,17 +356,15 @@ def get_outdated_runs(selected_user):
                         full_run = db.run.find_one({"runid": runid,
                                                     "qid": query['_id'],
                                                     "userid": userid})
-                        outdated_runs.append(full_run)
+                        outdated_runs_age.append(full_run)
 
                         continue
                 else:
                     print("Run not paired with timestamp, not able to clean up")
                     continue
 
-    return outdated_runs
+    return (outdated_runs_age, outdated_runs_doclist)
 
-
-##TODO: Receive 'runs' that consists of pairs (qid,runid)
 # Reactivate designated outdated runs
 def reactivate_runs(runs):
     reactivated_runs = []
