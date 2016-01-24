@@ -15,6 +15,8 @@
 
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 import json
+import os
+import pickle
 from .. import core, requires_login
 
 mod = Blueprint('admin', __name__, url_prefix='/admin')
@@ -49,20 +51,24 @@ def admin():
                 else:
                     site_participants[query["site_id"]][0].add(u)
 
-    stats = {"participants": {"verified":  len([u for u in participants
-                                                if u["is_verified"]]),
-                              "all":  len(participants),
-                              "active":  len(active_participants)
+    stats = {"participants": {"verified":  0,
+                              "all":  0,
+                              "active":  0
                               },
-             "sites": {"runs": len(site_participants),
-                       "all": len(sites),
-                       "active": len([s for s in sites if s["enabled"]])},
-             "queries": len(queries),
-             "per_site": {site["_id"]: {"participants": {"train": len(site_participants[site["_id"]][0]), "test":len(site_participants[site["_id"]][1])} if site["_id"] in site_participants else {"train":0, "test":0},
-                                        "queries": {"train": site_queries[site["_id"]][0], "test":site_queries[site["_id"]][1]} if site["_id"] in site_queries else {"train":0, "test":0}
+             "sites": {"runs": 0,
+                       "all":  0,
+                       "active": 0},
+             "queries": 0,
+             "per_site": {site["_id"]: {"participants": {"train": 0, "test":0},
+                                        "queries": {"train":0, "test":0}
                                     } for site in sites
                           }
              }
+
+    stats_file = "stats_admin.p"
+    if os.path.isfile(stats_file):
+        stats = pickle.load(open(stats_file,"rb"))
+
     return render_template("admin/admin.html", user=g.user, stats=stats, config=core.config.config)
 
 

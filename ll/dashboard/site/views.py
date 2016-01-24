@@ -46,12 +46,8 @@ def site(site_id):
              "doc":0,
              "impression":0,
              "click":0}
-    print "trying to load stats"
-    print stats_file
     if os.path.isfile(stats_file):
-        print "loading stats from file"
         stats = pickle.load(open(stats_file,"rb"))
-        print stats
 
     return render_template("site/site.html",
                            user=g.user,

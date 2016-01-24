@@ -108,13 +108,13 @@ def db(args, parser):
             Supply a MongoDB database, user, password, admin and admin \
             password  through the commandline or via a configuration file.")
     # Import JSON
-    if (args.import_json and args.mongodb_db
-    and args.mongodb_user and args.mongodb_user_pw):
+    if args.import_json:
+        print args.import_json
         ll.core.db.import_json(args.import_json, args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
-    elif args.import_json:
-        print("--import-json: Supply a MongoDB database, user and password \
-                    through the commandline or via a configuration file.")
+    #elif args.import_json:
+    #    print("--import-json: Supply a MongoDB database, user and password \
+    #                through the commandline or via a configuration file.")
     # Export JSON
     if (args.export_json and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw):

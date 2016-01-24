@@ -284,6 +284,8 @@ def get_deletable_runs(selected_user=None):
         for userid, runid_pair in allruns:
             print userid
             print selected_user
+            # If selected_user == None, no specific user is specified, and all outdated runs will be added
+            # If a user is selected, only outdated runs for this user will be added
             if selected_user == None or userid == selected_user:
                 # Check if runid is paired with a timestamp (new format)
                 if isinstance(runid_pair, list):
@@ -293,7 +295,7 @@ def get_deletable_runs(selected_user=None):
                         print "Doclist modified time: " + str(query['doclist_modified_time'])
                         if run_modified_time < (query['doclist_modified_time'] - reactivation_period):
                             print("Run older than latest doclist")
-                            # Look up full run and append this to outdated runs list
+                            # Look up full run and append this to deletable runs list
                             full_run = db.run.find_one({"runid": runid,
                                                         "qid": query['_id'],
                                                         "userid": userid})
@@ -305,7 +307,7 @@ def get_deletable_runs(selected_user=None):
                         print "Run older than threshold + reactivation period."
                         print "Run modified time: " + str(run_modified_time)
                         print "Age threshold - reaction period: " + str(age_threshold - reactivation_period)
-                        # Look up full run and append this to outdated runs list
+                        # Look up full run and append this to deletable runs list
                         full_run = db.run.find_one({"runid": runid,
                                                     "qid": query['_id'],
                                                     "userid": userid})
@@ -334,6 +336,8 @@ def get_outdated_runs(selected_user=None):
         for userid, runid_pair in allruns:
             print userid
             print selected_user
+            # If selected_user == None, no specific user is specified, and all outdated runs will be added
+            # If a user is selected, only outdated runs for this user will be added
             if selected_user == None or userid == selected_user:
                 # Check if runid is paired with a timestamp (new format)
                 if isinstance(runid_pair, list):
