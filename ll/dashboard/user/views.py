@@ -50,7 +50,7 @@ def login():
             # the session can't be modified as it's signed,
             # it's a safe place to store the user id
             session['key'] = user["_id"]
-            flash('Logged in %s' % user["teamname"], 'alert-success')
+            flash('Logged in as %s' % user["teamname"], 'alert-success')
             return redirect(url_for('home'))
         flash('Wrong email or password', 'alert-warning')
     return render_template("user/login.html", form=form, user=g.user, config=core.config.config)

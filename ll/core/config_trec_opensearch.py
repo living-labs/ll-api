@@ -26,7 +26,7 @@ config = {
     "URL_DASHBOARD": "http://dashboard.trec-open-search.org",
     "URL_DOC": "http://doc.trec-open-search.org",
     "URL_GIT": "https://bitbucket.org/living-labs/ll-api",
-    "URL_REGISTRATION_FORM": "http://living-labs.net/wp-content/uploads/2014/06/LLC14-Application-form.pdf",
+    "URL_REGISTRATION_FORM": "http://trec-open-search.org/wp-content/uploads/sites/9/2016/01/TRECOpenSearch2016-application-form-editable.pdf",
     "EMAIL_ORGANIZERS": ["krisztian.balog@uis.no",
                          "liadh.kelly@scss.tcd.ie",
                          "anne.schuth@uva.nl"],

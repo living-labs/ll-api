@@ -85,9 +85,9 @@ def send_password_email(user, password, subject="Password Reset"):
 
 
 def send_registration_email(user, password, subject="New Account"):
-    txt = "Thank you for registering to the %s.\n" % config["COMPETITION_NAME"]
+    txt = "Thank you for registering to Living Labs for %s.\n" % config["COMPETITION_NAME"]
     txt += "\n\n"
-    txt += "These are your Living Labs account details:\n"
+    txt += "These are your account details:\n"
     txt += "API key: %s\n" % user["_id"]
     txt += "teamname: %s\n" % user["teamname"]
     txt += "email: %s\n" % user["email"]
