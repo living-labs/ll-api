@@ -163,7 +163,7 @@ For TREC OpenSearch, issue:
 
     $ cp ll/core/config_trec_opensearch.py ll/core/config.py
     
-To start the API, run the following command: 
+To start the API, run the following command (without `config/db.ini` for an unauthenticated setup):
 
 .. sourcecode:: bash
     
@@ -171,7 +171,7 @@ To start the API, run the following command:
 
 If you want to automatically have the API reload when you change the code (which
 is incredibly handy when developing) then run this with :code:`--debug` the
-debug flag: 
+debug flag (without `config/db.ini` for an unauthenticated setup):
 
 .. sourcecode:: bash
 
@@ -183,13 +183,13 @@ In general, use :code:`--help` or :code:`-h` for more information.
 
 Fill the Database
 -----------------
-To fill the database with a standard configuration, including clients and sites, a fixture is available in the `dump` directory. We use the :code:`admin` tool to import this fixture:
+To fill the database with a standard configuration, including clients and sites, a fixture is available in the `dump` directory. We use the :code:`admin` tool to import this fixture (without :code:`-c config/db.ini` for an unauthenticated setup):
 
 .. sourcecode:: bash
 
     $ ./bin/admin db --import-json dump/ -c config/db.ini
 
-We want to check that the users have been created. Users are clients and sites connecting to the LivingLabs API and should not be confused with the database users created in the :ref:`Setup MongoDB<setup_mongodb>` section. To show all users (clients and sites), issue the following command:
+We want to check that the users have been created. Users are clients and sites connecting to the LivingLabs API and should not be confused with the database users created in the :ref:`Setup MongoDB<setup_mongodb>` section. To show all users (clients and sites), issue the following command (without :code:`-c config/db.ini` for an unauthenticated setup):
 
 .. sourcecode:: bash 
 
@@ -236,8 +236,8 @@ To run a site client and upload queries and documents, you can do the following:
 This assumes the API runs on :code:`localhost`, your own computer. If the :code:`--host` argument is omitted, a default online API (specified in :code:`ll/core/config.py`) is used.
 
 It will take TREC queries/runs/document (see :code:`-h` for file locations and
-how to change them) as a basis. Alternatively, with the :code:`--letor` switch, 
-this client will accept Learning to Rank (Letor) data.
+how to change them) as a basis. By default, `train` queries are added. If you want to upload `test` queries, use :code:`--query_type test`.
+Alternatively, with the :code:`--letor` switch, this client will accept Learning to Rank (Letor) data.
 
 Then, to simulate interactions, run the following:
 
@@ -307,7 +307,7 @@ configuration file (:code:`config/livinglabs.local.ini`). In particular, you wil
 key (see http://www.google.com/recaptcha), that will fill the `recaptchaprivate` and `recaptchapublic` fields.
 `csrfsecrettoken` and `secretkey` are both random strings you should generate.
 
-Then run the following command:
+Then run the following command (without `config/db.ini` for an unauthenticated setup):
 
 .. sourcecode:: bash
 
@@ -330,7 +330,7 @@ possible to create users via the command line, this also enables you
 to create site and admin users.
 
 To create an example participant and a site (for development/testing purposes),
-you can run the following script: 
+you can run the following script (without :code:`-c config/db.ini` for an unauthenticated setup):
 
 .. sourcecode:: bash 
 
@@ -353,7 +353,7 @@ Do not forget to supply the configuration file as an argument, this gives the AP
 Export the database
 -------------------
 You can export the database to create a human-readable json fixture, like the one we use to :ref:`fill the database<fill_db>`.
-To create a fixture in the `dump` directory, issue:
+To create a fixture in the `dump` directory, issue (without :code:`-c config/db.ini` for an unauthenticated setup):
 
 .. sourcecode:: bash 
 
@@ -363,7 +363,7 @@ To create a fixture in the `dump` directory, issue:
 Reset the Database
 ------------------
 
-In case you need a reset, you can simply run this. But, BE CAREFUL, it can not
+In case you need a reset, you can simply run this (without :code:`-c config/db.ini` for an unauthenticated setup). But, BE CAREFUL, it can not
 be undone (or, probably it can, the MongoDB is journalled, but it will not be
 trivial).
 
@@ -383,7 +383,7 @@ it will only take user impressions from the other participants. The participant
 could then request you as administrator to remove the runs.
 
 The admin tool has a :code:`--remove-runs` option to accomplish this. Supply the key
-of the participant for which you want to remove all runs.
+of the participant for which you want to remove all runs. (without :code:`-c config/db.ini` for an unauthenticated setup)
 
  .. danger::
     All runs for the given participant will be removed from the :code:`query`
