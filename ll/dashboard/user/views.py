@@ -111,18 +111,18 @@ def runs():
         print run
         default = False
         creation_time = run['creation_time']
-        run_str = json.dumps(run, default=json_util.default) + " Reason: run age."
         field_id = str(run["_id"])
-        setattr(RunsForm, field_id, BooleanField(creation_time, description=run_str))
+        descr = "Site ID: " + str(run["site_id"]) + ", query id: " + str(run["qid"]) + ", run ID: " + str(run["runid"]) + ", reason: outdated run"
+        setattr(RunsForm, field_id, BooleanField(label=creation_time, description=descr))
         field_to_run[field_id] = run
     for run in outdated_runs_doclist:
         print "original run"
         print run
         default = False
         creation_time = run['creation_time']
-        run_str = json.dumps(run, default=json_util.default) + " Reason: old doclist."
         field_id = str(run["_id"])
-        setattr(RunsForm, field_id, BooleanField(creation_time, description=run_str))
+        descr = "Site ID: " + str(run["site_id"]) + ", query ID: " + str(run["qid"]) + ", run ID: " + str(run["runid"]) + ", reason: run older than doclist"
+        setattr(RunsForm, field_id, BooleanField(label=creation_time, description=descr))
         field_to_run[field_id] = run
 
     form = RunsForm(request.form)
