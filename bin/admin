@@ -91,11 +91,11 @@ def db(args, parser):
     if (not args.setup_db_users):
         ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
-    
+
     # Clear database
     if args.clear:
         ll.core.db.clear()
-    
+
     # Create DB admin
     if (args.setup_db_users and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw
@@ -108,28 +108,20 @@ def db(args, parser):
             Supply a MongoDB database, user, password, admin and admin \
             password  through the commandline or via a configuration file.")
     # Import JSON
-    if args.import_json:
-        print args.import_json
+    if (args.import_json and args.mongodb_db):
         ll.core.db.import_json(args.import_json, args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
-    #elif args.import_json:
-    #    print("--import-json: Supply a MongoDB database, user and password \
-    #                through the commandline or via a configuration file.")
     # Export JSON
-    if (args.export_json and args.mongodb_db
-    and args.mongodb_user and args.mongodb_user_pw):
+    if args.export_json:
         ll.core.db.export_json(args.export_json, args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
-    elif args.export_json:
-        print("--export-json: Supply a MongoDB database, user and password \
-                    through the commandline or via a configuration file.")
 
 
 def trec(args, parser):
     # Log in to database
     ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                             args.mongodb_user, args.mongodb_user_pw, authenticationDatabase = args.mongodb_auth_db)
-    
+
     runs, qrels, qrels_raw = ll.core.run.get_trec(args.site_id)
     os.makedirs(os.path.join(args.dir, args.site_id, "run"))
     os.makedirs(os.path.join(args.dir, args.site_id, "qrel"))
@@ -228,10 +220,10 @@ if __name__ == '__main__':
                                 and user. Needs all --mongodb_ arguments.")
     subparser_db.add_argument("--import-json", type=str, conf_exclude=True,
                               help="Import the database from json files \
-                              in the given directory")
+                              in the given directory. Supply a database (default=ll) and database credentials if needed.")
     subparser_db.add_argument("--export-json", type=str, conf_exclude=True,
                               help="Export the database as json to the given \
-                              output directory")
+                              output directory. Supply a database (default=ll) and database credentials if needed.")
     add_mongodb(subparser_db)
     subparser_db.set_defaults(func=db, funcarg=subparser_db)
 
@@ -242,7 +234,7 @@ if __name__ == '__main__':
     add_mongodb(subparser_trec)
     subparser_trec.set_defaults(func=trec, funcarg=subparser_trec)
     args = parser.parse_args()
-    
-    
+
+
     trycall(args.func, args, args.funcarg)
-    
+
