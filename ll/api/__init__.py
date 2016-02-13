@@ -46,7 +46,7 @@ def db_cleanup():
     deletable_runs_age, deletable_runs_doclist = core.run.get_deletable_runs()
 
     for run in deletable_runs_age:
-        print "Run is now past reactivation period. Delete."
+        # Run is past reactivation period (reason: run older than threshold). Delete.
         run_user = get_user(run["userid"])
         run_user_id = run_user["_id"]
         run_email = run_user["email"]
@@ -61,13 +61,13 @@ def db_cleanup():
         del q_runs[run_user_id]
         q["runs"] = q_runs
         db.query.save(q)
-
-        send_email({'email': run_email, 'teamname': run_teamname},
-                   "Your outdated run " + run["runid"] + " is past the reactivation period and has been deleted.",
-                   "Run deleted")
+        if config["SEND_EMAIL_RUN_DELETED"]:
+            send_email({'email': run_email, 'teamname': run_teamname},
+                       "Your outdated run " + run["runid"] + " is past the reactivation period and has been deleted.",
+                       "Run deleted")
 
     for run in deletable_runs_doclist:
-        print "Run is now past reactivation period, document list obsolete. Delete."
+        # Run is past reactivation period (reason: run older than doclist). Delete.
         run_user = get_user(run["userid"])
         run_email = run_user["email"]
         run_teamname = run_user["teamname"]
@@ -80,51 +80,48 @@ def db_cleanup():
         del q_runs[run_user]
         q["runs"] = q_runs
         db.query.save(q)
-
-        send_email({'email': run_email, 'teamname': run_teamname},
-               "Your run " + run["runid"] + " is past the reactivation period (document list obsolete) and has been be deleted.",
-               "Run deleted")
+        if config["SEND_EMAIL_RUN_DELETED"]:
+            send_email({'email': run_email, 'teamname': run_teamname},
+                   "Your run " + run["runid"] + " is past the reactivation period (document list obsolete) and has been be deleted.",
+                   "Run deleted")
 
     outdated_runs_age, outdated_runs_doclist = core.run.get_outdated_runs()
 
     for run in outdated_runs_age:
-        # Only send outdated notification if no new notification has been sent
-        if "notification_sent_time" not in run or run["notification_sent_time"] < run["creation_time"]:
-            print("Run older than threshold, send e-mail: ", run["runid"], run["creation_time"])
-            run_user = get_user(run["userid"])
-            run_email = run_user["email"]
-            run_teamname = run_user["teamname"]
+        if config["SEND_EMAIL_RUN_OUTDATED"]:
+            # Only send outdated notification if no new notification has been sent
+            if "notification_sent_time" not in run or run["notification_sent_time"] < run["creation_time"]:
+                # Run older than threshold, send e-mail
+                run_user = get_user(run["userid"])
+                run_email = run_user["email"]
+                run_teamname = run_user["teamname"]
 
-            send_email({'email': run_email, 'teamname': run_teamname},
-                       "Your run " + run["runid"] + " is older than the set age threshold of " + str(config["RUN_AGE_THRESHOLD_DAYS"]) + " days. The run will be deleted in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
-                       str(config[
-                           "URL_REACTIVATION"]) + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
-                       "Outdated run")
+                send_email({'email': run_email, 'teamname': run_teamname},
+                           "Your run " + run["runid"] + " is older than the set age threshold of " + str(config["RUN_AGE_THRESHOLD_DAYS"]) + " days. The run will be deleted in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
+                           str(config[
+                               "URL_REACTIVATION"]) + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
+                           "Outdated run")
 
-            # Add time of notification to run, so no new notification is sent immediately
-            run["notification_sent_time"] = datetime.datetime.now()
-            db.run.save(run)
-        else:
-            print "Outdated, but notification has already been sent"
+                # Add time of notification to run, so no new notification is sent immediately
+                run["notification_sent_time"] = datetime.datetime.now()
+                db.run.save(run)
 
     for run in outdated_runs_doclist:
-        # Only send outdated notification if no new notification has been sent
-        if "notification_sent_time" not in run or run["notification_sent_time"] < run["creation_time"]:
-            print("Run older than latest doclist, send email: ", run["runid"], run["creation_time"])
-            run_user = get_user(run["userid"])
-            run_email = run_user["email"]
-            run_teamname = run_user["teamname"]
-            send_email({'email': run_email, 'teamname': run_teamname},
-                       "Your run " + run["runid"] + " is older than the corresponding document list, it will be deactivated in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
-                       config[
-                           "URL_REACTIVATION"] + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
-                       "Outdated run")
+        if config["SEND_EMAIL_RUN_OUTDATED"]:
+            # Only send outdated notification if no new notification has been sent
+            if "notification_sent_time" not in run or run["notification_sent_time"] < run["creation_time"]:
+                run_user = get_user(run["userid"])
+                run_email = run_user["email"]
+                run_teamname = run_user["teamname"]
+                send_email({'email': run_email, 'teamname': run_teamname},
+                           "Your run " + run["runid"] + " is older than the corresponding document list, it will be deactivated in " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days. If this run is valuable, you can reactivate it via " +
+                           config[
+                               "URL_REACTIVATION"] + " inside the reactivation period. After " + str(config["REACTIVATION_PERIOD_DAYS"]) + " days, it is not possible to reactivate anymore.",
+                           "Outdated run")
 
-            # Add time of notification to run, so no new notification is sent immediately
-            run["notification_sent_time"] = datetime.datetime.now()
-            db.run.save(run)
-        else:
-            print "Outdated, but notification has already been sent"
+                # Add time of notification to run, so no new notification is sent immediately
+                run["notification_sent_time"] = datetime.datetime.now()
+                db.run.save(run)
 
 
 def calculate_statistics():
