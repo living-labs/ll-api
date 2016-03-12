@@ -84,6 +84,14 @@ To grant `admin` the :code:`clusterManager` role:
 If you have not set up any users, you do not need to set any roles. Logging in using the anonymous user from localhost
 will automatically enable you to initiate the replication set.
 
+Set Azure keepalive time
+^^^^^^^^^^^^^^^^^^^^^^^^
+If you are using a server on Windows Azure, the `TCP keepalive time` will be set too high. This parameter controls
+after how many seconds a keepalive signal is sent. If this signal comes too late, the other side can close the connection.
+
+Set a lower keepalive time using the instructions here: http://docs.mongodb.org/ecosystem/platforms/windows-azure/
+
+
 Change database configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The configuration of both the current and the new database have to be changed, in order to be able to connect with eachother.
@@ -120,6 +128,43 @@ Now, again in the Mongo shell, add the new database to the replication set. Make
    > rs.add("ip-address:port")
 
 Congratulations, the replication set has been created and the data will be replicated!
+
+Has the initial sync finished?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+After a while, you might wonder whether the inital sync of files has finished. You can watch the log file of both databases.
+Furthermore, you can look dat `rs.status()` in the Mongo shell. It is a good sign if the new database has status `SECONDARY`.
+
+You may see that the data directory size of the old and new database differs. This could be normal. To check that the number
+of objects in both databases is the same, compare the output of the following on both databases:
+
+.. sourcecode:: bash
+
+   $ mongo -u ll -p --authenticationDatabase ll
+       > use ll
+       > db.stats()
+
+Log in with a user (in this case `ll`) which has the right role to perform db.stats().
+
+Using a new data directory
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you change to a new data directory for MongoDB, make sure you have the permissions of the folder right, they should look like this:
+
+.. sourcecode:: bash
+   $ ls -la
+     drwxr-xr-x.  4 mongod mongod  4096 30 jul 13:56 mongodb
+
+Furthermore, on CentOS, the SELinux rules for this directory also need to be updated, so follow the procedure under :ref:`SELinux`.
+
+Member of the replica set down
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+When a majority of the replica set members is down, it can happen that your PRIMARY (original) server, becomes SECONDARY.
+This is very unfortunate, because a SECONDARY server does not have write access, so you cannot add queries/runs/etc.
+
+The way to solve this is to remove the inactive members from the replica set configuration and do a forced reconfiguration.
+This process is described here:
+http://docs.mongodb.org/manual/tutorial/reconfigure-replica-set-with-unavailable-members/
+under ``Reconfigure by Forcing the Reconfiguration``. Another possibility may be to stop the replica set altogether, as described under ``Reconfigure by Replacing the Replica Set``
+on the same web page
 
 
 SELinux troubleshooting

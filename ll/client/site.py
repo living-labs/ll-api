@@ -50,7 +50,7 @@ class Site(Client):
                             help='Provide a user key.')
         self.parser.add_argument('-q', '--store_queries', action="store_true",
                             default=False,
-                            help='Store some queries (needs --query_file).')
+                            help='Store some queries (needs --query_file and --query_type).')
         self.parser.add_argument('--delete_queries', action="store_true",
                             default=False,
                             help='Delete all queries for this site.')
@@ -58,6 +58,10 @@ class Site(Client):
                             default=os.path.normpath(os.path.join(path,
                                                     "../../data/queries.xml")),
                             help='Path to TREC style query file '
+                            '(default: %(default)s).')
+        self.parser.add_argument('--query_type',
+                            default='train',
+                            help='Query type: \'train\' or \'test\''
                             '(default: %(default)s).')
         self.parser.add_argument('--letor', action="store_true",
                             default=False,
@@ -90,12 +94,12 @@ class Site(Client):
 
         if args.letor:
             if args.store_queries:
-                self.store_letor_queries(args.key, args.query_file)
+                self.store_letor_queries(args.key, args.query_file, args.query_type)
             if args.store_doclist:
                 self.store_letor_doclist(args.key, args.run_file)
         else:
             if args.store_queries:
-                self.store_queries(args.key, args.query_file)
+                self.store_queries(args.key, args.query_file, args.query_type)
             if args.store_doclist:
                 self.store_doclist(args.key, args.run_file, args.docs_dir)
 
@@ -106,7 +110,7 @@ class Site(Client):
         if args.delete_queries:
             self.delete_queries(args.key)
 
-    def store_queries(self, key, query_file):
+    def store_queries(self, key, query_file, query_type):
         tree = et.parse(query_file)
         topics = tree.getroot()
         queries = {"queries": []}
@@ -117,7 +121,9 @@ class Site(Client):
             queries["queries"].append({
                 "qstr": qstr,
                 "site_qid": qid,
+                "type": query_type
             })
+        print queries
         url = "/".join([self.host, QUERYENDPOINT, key])
         self.put(url, json.dumps(queries))
 

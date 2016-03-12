@@ -24,6 +24,7 @@ config = {
     "URL_WEB": "http://trec-open-search.org",
     "URL_API": "http://api.trec-open-search.org/api",
     "URL_DASHBOARD": "http://dashboard.trec-open-search.org",
+    "URL_REACTIVATION": "http://dashboard.trec-open-search.org/user/runs",
     "URL_DOC": "http://doc.trec-open-search.org",
     "URL_GIT": "https://bitbucket.org/living-labs/ll-api",
     "URL_REGISTRATION_FORM": "http://trec-open-search.org/wp-content/uploads/sites/9/2016/01/TRECOpenSearch2016-application-form-editable.pdf",
@@ -39,4 +40,10 @@ config = {
     "ROLLBAR_API_KEY": "719ef6f2566f46af9b849fdbc9d43680",
     "ROLLBAR_DASHB0ARD_KEY": "ccf521ba5e49428ebc79bd82b14587fa",
     "ROLLBAR_ENV": "production",
+    "CALC_STATS_INTERVAL_HOURS": 12,
+    "CLEANUP_INTERVAL_HOURS": 12,
+    "RUN_AGE_THRESHOLD_DAYS": 14,
+    "REACTIVATION_PERIOD_DAYS": 7,
+    "SEND_EMAIL_RUN_OUTDATED": True,
+    "SEND_EMAIL_RUN_OUTDATED": True
 }
