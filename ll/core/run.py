@@ -329,7 +329,7 @@ def get_outdated_runs(selected_user=None):
     outdated_runs_age = []
     outdated_runs_doclist = []
     for query in queries:
-        allruns = query["runs"].items()
+        allruns = query.get("runs", {}).items()
         for userid, runid_pair in allruns:
             print userid
             print selected_user
