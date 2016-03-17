@@ -277,7 +277,7 @@ def get_deletable_runs(selected_user=None):
     deletable_runs_age = []
     deletable_runs_doclist = []
     for query in queries:
-        allruns = query["runs"].items()
+        allruns = query.get("runs", {}).items()
         for userid, runid_pair in allruns:
             print userid
             print selected_user
