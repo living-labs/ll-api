@@ -128,9 +128,14 @@ def get_run(key, qid):
     if "runs" not in q or key not in q["runs"]:
         raise LookupError("No run for this query: qid = '%s'" % qid)
 
+    if type(q["runs"][key]) == tuple:
+        runid = q["runs"][key][0]
+    else:
+        runid = q["runs"][key]
+
     run = db.run.find_one({"userid": key,
                            "qid": qid,
-                           "runid": q["runs"][key]})
+                           "runid": runid})
     return run
 
 
