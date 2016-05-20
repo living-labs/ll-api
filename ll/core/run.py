@@ -128,9 +128,11 @@ def get_run(key, qid):
     if "runs" not in q or key not in q["runs"]:
         raise LookupError("No run for this query: qid = '%s'" % qid)
 
+    runid = q["runs"][key][0]
+
     run = db.run.find_one({"userid": key,
                            "qid": qid,
-                           "runid": q["runs"][key]})
+                           "runid": runid})
     return run
 
 
@@ -277,7 +279,7 @@ def get_deletable_runs(selected_user=None):
     deletable_runs_age = []
     deletable_runs_doclist = []
     for query in queries:
-        allruns = query["runs"].items()
+        allruns = query.get("runs", {}).items()
         for userid, runid_pair in allruns:
             print userid
             print selected_user
@@ -329,7 +331,7 @@ def get_outdated_runs(selected_user=None):
     outdated_runs_age = []
     outdated_runs_doclist = []
     for query in queries:
-        allruns = query["runs"].items()
+        allruns = query.get("runs", {}).items()
         for userid, runid_pair in allruns:
             print userid
             print selected_user

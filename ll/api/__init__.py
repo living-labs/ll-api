@@ -230,8 +230,8 @@ app = Flask(__name__)
 api = Api(app, catch_all_404s=True)
 
 cron = BackgroundScheduler()
-cron.add_job(db_cleanup, 'interval', id='cleanjob', hours=config["CLEANUP_INTERVAL_HOURS"])
-cron.add_job(calculate_statistics, 'interval', id='statjob', hours=config["CALC_STATS_INTERVAL_HOURS"])
+#cron.add_job(db_cleanup, 'interval', id='cleanjob', hours=config["CLEANUP_INTERVAL_HOURS"])
+cron.add_job(calculate_statistics, 'interval', id='statjob', hours=.5)
 
 
 @app.before_first_request
