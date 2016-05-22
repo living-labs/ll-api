@@ -18,7 +18,7 @@ import datetime
 config = {
     "KEY_LENGTH": 32,
     "PASSWORD_LENGHT": 8,
-    "EMAIL_FROM": 'organizers@trec-open-search.org',
+    "EMAIL_FROM": 'trec-os-organizers@googlegroups.com',
     "SEND_EMAIL": True,
     "COMPETITION_NAME": "TREC OpenSearch",
     "URL_WEB": "http://trec-open-search.org",
