@@ -35,7 +35,11 @@ def add_feedback(site_id, sid, feedback):
 
     for k in feedback:
         existing_feedback[k] = feedback[k]
-    existing_feedback["modified_time"] = datetime.datetime.now()
+    
+    if "modified_time" in feedback:
+        existing_feedback["modified_time"] = feedback["modified_time"]
+    else:
+        existing_feedback["modified_time"] = datetime.datetime.now()
     db.feedback.save(existing_feedback)
     return existing_feedback
 
