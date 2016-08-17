@@ -36,10 +36,7 @@ def add_feedback(site_id, sid, feedback):
     for k in feedback:
         existing_feedback[k] = feedback[k]
     
-    if "modified_time" in feedback:
-        existing_feedback["modified_time"] = feedback["modified_time"]
-    else:
-        existing_feedback["modified_time"] = datetime.datetime.now()
+    existing_feedback["modified_time"] = datetime.datetime.now()
     db.feedback.save(existing_feedback)
     return existing_feedback
 
@@ -191,7 +188,7 @@ def get_comparison(userid=None, site_id=None, qtype=None, qid=None):
         nr_ties = 0
         for f in feedbacks:
             if test_period and not (test_period["START"] <
-                                    f["modified_time"] <
+                                    f["creation_time"] <
                                     test_period["END"]):
                 continue
 
