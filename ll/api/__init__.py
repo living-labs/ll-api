@@ -174,15 +174,15 @@ def calculate_statistics():
                 clicks += len([d for d in feedback["doclist"]
                                if "clicked" in d and d["clicked"]])
 
-                stats = {"run": core.db.db.run.find({"site_id": site_id,
-                                                 "userid": participant_id}).count(),
-                     "query": core.db.db.query.find({"site_id": site_id}).count(),
-                     "doc": core.db.db.doc.find({"site_id": site_id}).count(),
-                     "impression": feedbacks.count(),
-                     "click": clicks,
-                     }
-                stats_file = "stats_participant_site_" + participant_id + "_" + site_id + ".p"
-                pickle.dump(stats,open(stats_file,"wb"))
+            stats = {"run": core.db.db.run.find({"site_id": site_id,
+                                             "userid": participant_id}).count(),
+                 "query": core.db.db.query.find({"site_id": site_id}).count(),
+                 "doc": core.db.db.doc.find({"site_id": site_id}).count(),
+                 "impression": feedbacks.count(),
+                 "click": clicks,
+                 }
+            stats_file = "stats_participant_site_" + participant_id + "_" + site_id + ".p"
+            pickle.dump(stats,open(stats_file,"wb"))
 
     # Calculate admin statistics
     queries = core.query.get_query()
