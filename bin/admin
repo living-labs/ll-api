@@ -91,11 +91,11 @@ def db(args, parser):
     if (not args.setup_db_users):
         ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                                 args.mongodb_user, args.mongodb_user_pw, args.mongodb_auth_db)
-    
+
     # Clear database
     if args.clear:
         ll.core.db.clear()
-    
+
     # Create DB admin
     if (args.setup_db_users and args.mongodb_db
     and args.mongodb_user and args.mongodb_user_pw
@@ -121,7 +121,7 @@ def trec(args, parser):
     # Log in to database
     ll.core.db.db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db,
                             args.mongodb_user, args.mongodb_user_pw, authenticationDatabase = args.mongodb_auth_db)
-    
+
     runs, qrels, qrels_raw = ll.core.run.get_trec(args.site_id)
     os.makedirs(os.path.join(args.dir, args.site_id, "run"))
     os.makedirs(os.path.join(args.dir, args.site_id, "qrel"))
@@ -234,7 +234,7 @@ if __name__ == '__main__':
     add_mongodb(subparser_trec)
     subparser_trec.set_defaults(func=trec, funcarg=subparser_trec)
     args = parser.parse_args()
-    
-    
+
+
     trycall(args.func, args, args.funcarg)
-    
+

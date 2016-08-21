@@ -24,6 +24,7 @@ config = {
     "URL_WEB": "http://living-labs.net",
     "URL_API": "http://api.living-labs.net/api",
     "URL_DASHBOARD": "http://dashboard.living-labs.net",
+    "URL_REACTIVATION": "http://dashboard.living-labs.net/user/runs",
     "URL_DOC": "http://doc.living-labs.net",
     "URL_GIT": "https://bitbucket.org/living-labs/ll-api",
     "URL_REGISTRATION_FORM": "http://living-labs.net/wp-content/uploads/2014/06/LLC14-Application-form.pdf",
@@ -59,4 +60,10 @@ config = {
     "ROLLBAR_API_KEY": "719ef6f2566f46af9b849fdbc9d43680",
     "ROLLBAR_DASHB0ARD_KEY": "ccf521ba5e49428ebc79bd82b14587fa",
     "ROLLBAR_ENV": "production",
+    "CALC_STATS_INTERVAL_HOURS": 1,
+    "CLEANUP_INTERVAL_HOURS": 6,
+    "RUN_AGE_THRESHOLD_DAYS": 30,
+    "REACTIVATION_PERIOD_DAYS": 7,
+    "SEND_EMAIL_RUN_OUTDATED": True,
+    "SEND_EMAIL_RUN_DELETED": True
 }

@@ -16,6 +16,8 @@
 from flask import Blueprint, request, render_template, flash, g, session, redirect, url_for
 import json
 from .. import core, requires_login
+import os
+import pickle
 
 mod = Blueprint('my', __name__, url_prefix='/my')
 
@@ -36,22 +38,17 @@ def my():
 @requires_login
 def site(site_id):
     site = core.site.get_site(site_id)
-    feedbacks = core.db.db.feedback.find({"site_id": site_id,
-                                          "userid": g.user["_id"]})
-    clicks = 0
-    for feedback in feedbacks:
-        if "doclist" not in feedback:
-            continue
-        clicks += len([d for d in feedback["doclist"]
-                       if "clicked" in d and d["clicked"]])
 
-    stats = {"run": core.db.db.run.find({"site_id": site_id,
-                                         "userid": g.user["_id"]}).count(),
-             "query": core.db.db.query.find({"site_id": site_id}).count(),
-             "doc": core.db.db.doc.find({"site_id": site_id}).count(),
-             "impression": feedbacks.count(),
-             "click": clicks,
+    stats = {"run": 0,
+             "query": 0,
+             "doc": 0,
+             "impression": 0,
+             "click": 0,
              }
+
+    stats_file = "stats_participant_site_" + g.user["_id"] + "_" + site_id + ".p"
+    if os.path.isfile(stats_file):
+        stats = pickle.load(open(stats_file,"rb"))
 
     return render_template("my/site.html",
                            user=g.user,

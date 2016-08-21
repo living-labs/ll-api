@@ -21,6 +21,7 @@ import sys
 import logging
 import urllib3
 urllib3.disable_warnings()
+import atexit
 
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -31,7 +32,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.realpath(__file__),
                                                 "../..")))
 
 from ll.core.db import db
-from ll.api import app
+from ll.api import app, cron
 import ll.api.participant
 import ll.api.site
 from ll.core.config import config
@@ -62,7 +63,14 @@ if __name__ == '__main__':
     group_mongodb.add_argument('--mongodb_auth_db', default=None, type=str,
                         help='')
     args = parser.parse_args()
+
     print("Starting %s" % description)
+
+    # Start cron job, which regularly removes old runs from the database
+    cron.start()
+    # Shutdown your cron thread if the web process is stopped
+    atexit.register(lambda: cron.shutdown(wait=False))
+
     app.debug = args.debug
     db.init_db(args.mongodb_host, args.mongodb_port, args.mongodb_db, user=args.mongodb_user,
                password=args.mongodb_user_pw, authenticationDatabase = args.mongodb_auth_db)
@@ -71,3 +79,5 @@ if __name__ == '__main__':
     ioloop = IOLoop.instance()
     autoreload.start(ioloop)
     ioloop.start()
+
+

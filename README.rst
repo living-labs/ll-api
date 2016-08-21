@@ -67,4 +67,4 @@ along with this program.  If not, see http://www.gnu.org/licenses/.
 Acknowledgements
 ----------------
 The development of this code is partially supported by the EU FP7 project 
-LiMoSINe (http://www.limosine-project.eu).
+LiMoSINe (http://www.limosine-project.eu) and by the ESF ELIAS Research Networking Programme.

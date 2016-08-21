@@ -21,7 +21,8 @@ from werkzeug import check_password_hash
 
 from .. import core, requires_login
 from forms import LoginForm, RegisterForm, ForgotForm
-
+from bson import json_util
+import json
 mod = Blueprint('user', __name__, url_prefix='/user')
 
 
@@ -87,6 +88,55 @@ def register():
     return render_template("user/register.html", form=form, user=g.user, config=core.config.config)
 
 
+@mod.route('/runs/', methods=['GET', 'POST'])
+@requires_login
+def runs():
+    if not g.user["is_participant"]:
+        flash('Only participants can select runs. Please register or sign in as a participant', 'alert-warning')
+        return redirect(url_for('user.home'))
+    if not g.user["is_verified"]:
+        flash('You need to be verified first, please send the organizers a signed <a href="%s">registration form<a/>.'
+              % core.config.config["URL_REGISTRATION_FORM"], 'alert-warning')
+        return redirect(url_for('user.home'))
+
+    class RunsForm(Form):
+        pass
+
+    field_to_run = {}
+
+    outdated_runs_age, outdated_runs_doclist = core.run.get_outdated_runs(g.user["_id"])
+
+    for run in outdated_runs_age:
+        print "original run"
+        print run
+        default = False
+        creation_time = run['creation_time']
+        field_id = str(run["_id"])
+        descr = "Site ID: " + str(run["site_id"]) + ", query id: " + str(run["qid"]) + ", run ID: " + str(run["runid"]) + ", reason: outdated run"
+        setattr(RunsForm, field_id, BooleanField(label=creation_time, description=descr))
+        field_to_run[field_id] = run
+    for run in outdated_runs_doclist:
+        print "original run"
+        print run
+        default = False
+        creation_time = run['creation_time']
+        field_id = str(run["_id"])
+        descr = "Site ID: " + str(run["site_id"]) + ", query ID: " + str(run["qid"]) + ", run ID: " + str(run["runid"]) + ", reason: run older than doclist"
+        setattr(RunsForm, field_id, BooleanField(label=creation_time, description=descr))
+        field_to_run[field_id] = run
+
+    form = RunsForm(request.form)
+    if form.validate_on_submit():
+        print "form data:"
+        print form.data
+        selected_runs = [field_to_run[k] for k in form.data if form.data[k]]
+        print "following runs will be activated:"
+        print selected_runs
+        core.run.reactivate_runs(selected_runs)
+        flash('Outdated runs have been reactivated.', 'alert-success')
+        return redirect(url_for('user.home'))
+    return render_template("user/runs.html", form=form, user=g.user, config=core.config.config)
+
 @mod.route('/sites/', methods=['GET', 'POST'])
 @requires_login
 def sites():
@@ -107,7 +157,7 @@ def sites():
             continue
         description = site["terms"] if "terms" in site and site["terms"] else "No additional terms."
         default = True if site['_id'] in usersites else False
-        setattr(SitesForm, site['_id'], BooleanField(site['name'] + ("<img src=\"/static/icon_robot.svg\" style=\"height: 14px; position: relative;top: -3px;left: 2px;\"/>" 
+        setattr(SitesForm, site['_id'], BooleanField(site['name'] + ("<img src=\"/static/icon_robot.svg\" style=\"height: 14px; position: relative;top: -3px;left: 2px;\"/>"
                                                                      if site["is_robot"] else ""),
                                                      description=description,
                                                      default=default))
@@ -119,7 +169,6 @@ def sites():
         flash('Agreements to site terms have been saved.', 'alert-success')
         return redirect(url_for('site.home'))
     return render_template("user/sites.html", form=form, user=g.user, config=core.config.config)
-
 
 @mod.route('/forgot/', methods=['GET', 'POST'])
 def forgot():
