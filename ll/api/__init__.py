@@ -167,6 +167,7 @@ def calculate_statistics():
             site_id = site["_id"]
             feedbacks = core.db.db.feedback.find({"site_id": site_id,
                                               "userid": participant_id})
+
             clicks = 0
             for feedback in feedbacks:
                 if "doclist" not in feedback:
@@ -180,7 +181,7 @@ def calculate_statistics():
                  "doc": core.db.db.doc.find({"site_id": site_id}).count(),
                  "impression": feedbacks.count(),
                  "click": clicks,
-                 }
+                }
             stats_file = "stats_participant_site_" + participant_id + "_" + site_id + ".p"
             pickle.dump(stats,open(stats_file,"wb"))
 
@@ -190,16 +191,17 @@ def calculate_statistics():
     active_participants = set()
     site_participants = {}
     site_queries = {}
+    
     for query in queries:
         if not query["site_id"] in site_participants:
             site_participants[query["site_id"]] = [set(), set()]
         if not query["site_id"] in site_queries:
             site_queries[query["site_id"]] = [0, 0]
+        if "type" in query and query["type"] == "test":
+            site_queries[query["site_id"]][1] += 1
+        else:
+            site_queries[query["site_id"]][0] += 1
         if "runs" in query:
-            if "type" in query and query["type"] == "test":
-                site_queries[query["site_id"]][1] += 1
-            else:
-                site_queries[query["site_id"]][0] += 1
             for u in query["runs"]:
                 active_participants.add(u)
                 if "type" in query and query["type"] == "test":

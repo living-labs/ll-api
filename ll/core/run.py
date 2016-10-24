@@ -222,7 +222,7 @@ def get_trec(site_id):
             qid = q["_id"]
             feedbacks = feedback.get_test_feedback(site_id=site_id, qid=qid)
             test_period_feedbacks[qid] = [f for f in feedbacks if (test_period["START"] <
-                                                                   f["modified_time"] <
+                                                                   f["creation_time"] <
                                                                    test_period["END"])]
         trec_qrels.append(get_trec_qrel(test_period_feedbacks,
                                         test_period["NAME"]))
