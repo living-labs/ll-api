@@ -14,37 +14,52 @@
 # along with Living Labs Challenge. If not, see <http://www.gnu.org/licenses/>.
 
 import datetime, pymongo
+from bson import json_util
 from db import db
 from config import config
 import doc, query, user
 import json
 from pprint import pprint
 
-def add_feedback_from_json(json_file,mongodb_host, mongodb_port, mongodb_db, mongodb_user, mongodb_user_pw, mongodb_auth_db):
-    with open(json_file,"r") as feedback_file:
-        feedbacks = json.load(feedback_file)
-        for feedback in feedbacks[:1]:
-            print feedback
-            
-    #existing_feedback = db.feedback.find_one({"site_id": site_id, "_id": sid})
-    #if existing_feedback is None:
-        #raise LookupError("Session not found: sid = '%s'." % sid)
-    #for doc in feedback["doclist"]:
-        #doc_found = db.doc.find_one({"site_id": site_id,
-                                     #"site_docid": doc["site_docid"]
-                                     #})
-        #if not doc_found:
-            #raise LookupError("Document not found: site_docid = '%s'. Please"
-                            #"only provide feedback for documents that are"
-                            #"allowed for a query." % doc["site_docid"])
-        #doc["docid"] = doc_found["_id"]
 
-    #for k in feedback:
-        #existing_feedback[k] = feedback[k]
-    
-    #existing_feedback["modified_time"] = datetime.datetime.now()
-    #db.feedback.save(existing_feedback)
-    #return existing_feedback
+
+def add_feedback_from_json(json_file,site_id, mongodb_host, mongodb_port, mongodb_db, mongodb_user, mongodb_user_pw, mongodb_auth_db):
+    print site_id
+    with open(json_file,"r") as feedback_file:
+        feedbacks = json.load(feedback_file,object_hook=json_util.object_hook)
+    for feedback in feedbacks:
+        print feedback
+        sid = feedback["sid"]
+        
+        existing_feedback = db.feedback.find_one({"site_id": site_id, "_id": sid})
+        print "Old feedback: "
+        print existing_feedback
+        backup_filename = "old_json_backup/" + str(sid) + "-" + ".".join(str(datetime.datetime.now()).split()) + ".txt"
+        with open(backup_filename,"w") as backup_file:
+            json.dump(existing_feedback,backup_file, default=json_util.default)
+        print
+        if existing_feedback is None:
+            raise LookupError("Session not found: sid = '%s'." % sid)
+        for doc in feedback["doclist"]:
+            doc_found = db.doc.find_one({"site_id": site_id,
+                                         "site_docid": doc["site_docid"]
+                                         })
+            if not doc_found:
+                raise LookupError("Document not found: site_docid = '%s'. Please"
+                                "only provide feedback for documents that are"
+                                "allowed for a query." % doc["site_docid"])
+            doc["docid"] = doc_found["_id"]
+
+        for k in feedback:
+            existing_feedback[k] = feedback[k]
+        
+        existing_feedback["modified_time"] = datetime.datetime.now()
+        print "New feedback:"
+        print existing_feedback
+        print
+        print
+        #db.feedback.save(existing_feedback)
+    return 0
 
 def add_feedback(site_id, sid, feedback):
     existing_feedback = db.feedback.find_one({"site_id": site_id, "_id": sid})
@@ -215,7 +230,7 @@ def get_comparison(userid=None, site_id=None, qtype=None, qid=None):
         nr_ties = 0
         for f in feedbacks:
             if test_period and not (test_period["START"] <
-                                    f["modified_time"] <
+                                    f["creation_time"] <
                                     test_period["END"]):
                 continue
 
