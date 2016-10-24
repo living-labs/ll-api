@@ -19,6 +19,8 @@ import os
 import pickle
 from .. import core, requires_login
 
+
+
 mod = Blueprint('admin', __name__, url_prefix='/admin')
 
 
@@ -71,6 +73,21 @@ def admin():
 
     return render_template("admin/admin.html", user=g.user, stats=stats, config=core.config.config)
 
+@mod.route('/<site_id>/run')
+@requires_login
+def run(site_id):
+    site = core.site.get_site(site_id)
+    runs=core.db.db.run.find({"site_id": site_id})
+    runs = list(runs)
+    for run in runs:
+        user_teamname = core.user.get_user(run["userid"])["teamname"]
+        run["user_teamname"] = user_teamname
+    return render_template("admin/run.html",
+                           user = g.user,
+                           site=site,
+                           config=core.config.config,
+                           runs=runs)
+                           
 
 @mod.route('/outcome/<site_id>')
 @requires_login
