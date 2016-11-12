@@ -76,17 +76,22 @@ def admin():
 @mod.route('/<site_id>/run')
 @requires_login
 def run(site_id):
+    n_runs = 1000
     site = core.site.get_site(site_id)
     runs=core.db.db.run.find({"site_id": site_id})
-    #runs = list(runs)
-    #for run in runs:
-    #    user_teamname = core.user.get_user(run["userid"])["teamname"]
-    #    run["user_teamname"] = user_teamname
+    sorted_runs = sorted(runs, key=lambda x: x["creation_time"], reverse=True)[:n_runs]
+    user_dict = {}
+    users = core.user.get_users()
+    for user in users:
+        user_dict[user["_id"]] = user["teamname"]
+    
     return render_template("admin/run.html",
                            user = g.user,
                            site=site,
                            config=core.config.config,
-                           runs=runs)
+                           runs=sorted_runs,
+                           user_dict = user_dict,
+                           n = n_runs)
                            
 
 @mod.route('/outcome/<site_id>')

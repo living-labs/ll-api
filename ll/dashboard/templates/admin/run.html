@@ -15,7 +15,7 @@
  #}
    {% extends "base.html" %}
    {% block header %}
-    	Admin Runs for {{ site.name }}
+    	Admin Runs for {{ site.name }} (last {{n}})
    {% endblock %}
    {% block content %}
     <table class="table table-striped table-hover ">
@@ -31,7 +31,7 @@
     <tbody>
     {% for run in runs %}
     <tr>
-      <td>{{ run.userid }}</td>
+      <td>{{ user_dict[run.userid] }}</td>
       <td>{{ run.runid }}</td>
       <td>{{ run.qid }}</td>
       <td>{{ run.creation_time }}</td>
