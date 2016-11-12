@@ -78,10 +78,10 @@ def admin():
 def run(site_id):
     site = core.site.get_site(site_id)
     runs=core.db.db.run.find({"site_id": site_id})
-    runs = list(runs)
-    for run in runs:
-        user_teamname = core.user.get_user(run["userid"])["teamname"]
-        run["user_teamname"] = user_teamname
+    #runs = list(runs)
+    #for run in runs:
+    #    user_teamname = core.user.get_user(run["userid"])["teamname"]
+    #    run["user_teamname"] = user_teamname
     return render_template("admin/run.html",
                            user = g.user,
                            site=site,
