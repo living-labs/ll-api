@@ -17,6 +17,7 @@ from flask import Blueprint, request, render_template, flash, g, session, redire
 import json
 import os
 import pickle
+import pymongo
 from .. import core, requires_login
 
 
@@ -78,8 +79,7 @@ def admin():
 def run(site_id):
     n_runs = 1000
     site = core.site.get_site(site_id)
-    runs=core.db.db.run.find({"site_id": site_id})
-    sorted_runs = sorted(runs, key=lambda x: x["creation_time"], reverse=True)[:n_runs]
+    runs=core.db.db.run.find({"site_id": site_id}).sort("creation_time", pymongo.DESCENDING)[:n_runs]
     user_dict = {}
     users = core.user.get_users()
     for user in users:
@@ -89,7 +89,7 @@ def run(site_id):
                            user = g.user,
                            site=site,
                            config=core.config.config,
-                           runs=sorted_runs,
+                           runs=runs,
                            user_dict = user_dict,
                            n = n_runs)
                            
