@@ -20,7 +20,7 @@ import rollbar.contrib.flask
 import atexit
 import datetime
 from flask import Flask, g, redirect
-from flask.ext.restful import Api, abort
+from flask_restful import Api, abort
 from flask_limiter import Limiter
 from flask import got_request_exception
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -191,7 +191,7 @@ def calculate_statistics():
     active_participants = set()
     site_participants = {}
     site_queries = {}
-    
+
     for query in queries:
         if not query["site_id"] in site_participants:
             site_participants[query["site_id"]] = [set(), set()]

@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Living Labs Challenge. If not, see <http://www.gnu.org/licenses/>.
 
-from flask.ext.wtf import Form
+from flask_wtf import FlaskForm as Form
 from wtforms import BooleanField
 from flask import Blueprint, request, render_template, flash, g, session, \
                     redirect, url_for
@@ -176,7 +176,7 @@ def forgot():
     if form.validate_on_submit():
         try:
             core.user.reset_password(form.email.data)
-        except Exception, e:
+        except Exception as e:
             flash(str(e), 'alert-warning')
             return redirect(url_for('user.forgot'))
         flash('A new password has been sent to %s.' % form.email.data,

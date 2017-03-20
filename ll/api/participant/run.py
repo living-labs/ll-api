@@ -14,7 +14,7 @@
 # along with Living Labs Challenge. If not, see <http://www.gnu.org/licenses/>.
 
 from flask import request
-from flask.ext.restful import Resource, fields, marshal
+from flask_restful import Resource, fields, marshal
 from .. import api
 from .. import core
 from .. import ApiResource

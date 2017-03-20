@@ -15,7 +15,7 @@
 
 import traceback
 import re
-from flask.ext.restful import Resource, abort, fields
+from flask_restful import Resource, abort, fields
 from .. import core
 
 
